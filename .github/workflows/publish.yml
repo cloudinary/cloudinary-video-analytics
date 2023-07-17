@@ -1,0 +1,55 @@
+name: Publish new version of package 🚀
+
+on:
+  workflow_dispatch:
+    inputs:
+      version-type:
+        type: choice
+        required: true
+        default: patch
+        description: New version type
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout master branch with history for diffing
+        uses: actions/checkout@v3
+        with:
+          ref: 'refs/heads/master'
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure Git
+        run: |
+          git config user.name "cloudinary-bot"
+          git config user.email "cloudinary-bot@clodinary.com"
+
+      - name: Setup yarn
+        run: npm install -g yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Bump version
+        run: npm version ${{ github.event.inputs.version-type }} -m "Bumping to version %s" --tag-version-prefix=""
+
+      - name: Build
+        shell: bash
+        run: yarn build
+
+      - name: Publish packages
+        run: npm publish --access="public"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push changes
+        run: git push --tags --set-upstream origin master --force

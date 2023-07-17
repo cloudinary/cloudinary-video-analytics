@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Cloudinary Video Analytics</title>
+  <link href="https://res.cloudinary.com/cloudinary-marketing/image/upload/f_auto,q_auto/c_scale,w_32/v1597183771/creative_staging/cloudinary_internal/Website/Brand%20Updates/Favicon/cloudinary_web_favicon_192x192.png" rel="icon" type="image/png">
+
+  <!-- Bootstrap -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <style>
+    video {
+        display: block;
+        max-width: 100%;
+    }
+
+    /* HIDE RADIO */
+    [type=radio] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* IMAGE STYLES */
+    [type=radio] + img {
+        width: 50px;
+        height: 50px;
+        cursor: pointer;
+    }
+
+    /* CHECKED STYLES */
+    [type=radio]:checked + img {
+        outline: 2px solid #f00;
+    }
+
+  </style>
+</head>
+<body>
+<div class="container col-12">
+  <nav class="nav mb-2">
+    <a href="http://localhost:3001/events" target="_blank">Open local server in new tab</a>
+  </nav>
+  <h1 class="text-center">Cloudinary Video Analytics</h1>
+  <br/><br/><br/>
+
+  <div class="row">
+    <div class="col-3">
+
+      <strong>Change video source</strong>
+      <br/><br/>
+      <div>
+        <label>
+          <input type="radio" name="videoType" value="0" checked>
+          <img src="https://res-console.cloudinary.com/demo/thumbnails/transform/v1/video/upload/Yl9hdXRvOnByZWRvbWluYW50LGNfcGFkLGhfMzAwLHdfMzAwLGR1XzEw/v1/c2FtcGxlcy9jbGQtc2FtcGxlLXZpZGVv/template_primary" alt="Option 1">
+        </label>
+
+        <label>
+          <input type="radio" name="videoType" value="1">
+          <img src="https://res-console.cloudinary.com/demo/thumbnails/transform/v1/video/upload/Y19saW1pdCxoXzE2MDAsd18xNjAwLGR1XzEw/v1/ZWxlcGhhbnRzX3hkYnBmYQ==/template_primary" alt="Option 2">
+        </label>
+
+        <label>
+          <input type="radio" name="videoType" value="2">
+          <img src="https://res-console.cloudinary.com/demo/thumbnails/transform/v1/video/upload/Yl9hdXRvOnByZWRvbWluYW50LGNfcGFkLGhfMzAwLHdfMzAwLGR1XzEw/v1/Y2xkLXNhbXBsZS12aWRlbw==/template_primary" alt="Option 1">
+        </label>
+      </div>
+    </div>
+    <div class="col-9">
+      <video
+          id="main-video-player"
+          src="https://res.cloudinary.com/demo/video/upload/v1651840278/samples/cld-sample-video.mp4"
+          controls
+      >
+      </video>
+    </div>
+  </div>
+
+  <br/><br/><br/>
+  <h2 class="text-center">Additional Video Elements</h2>
+  <br/><br/><br/>
+
+  <div class="row">
+    <div class="col-6">
+      <video
+          id="extra-video-1"
+          src="https://res.cloudinary.com/demo/video/upload/v1689428506/elephants_xdbpfa.mp4"
+          controls
+      >
+      </video>
+    </div>
+    <div class="col-6">
+      <video
+          id="extra-video-2"
+          src="https://res.cloudinary.com/demo/video/upload/v1643890261/cld-sample-video.mp4"
+          controls
+      >
+      </video>
+    </div>
+  </div>
+
+  <br/><br/><br/>
+
+</div>
+</body>
+</html>
