@@ -1,5 +1,5 @@
-import { connectCloudinaryAnalytics } from 'cloudinary-video-analytics';
-window.connectCloudinaryAnalytics = connectCloudinaryAnalytics;
+import cloudinaryAnalytics from 'cloudinary-video-analytics';
+window.connectCloudinaryAnalytics = cloudinaryAnalytics;
 
 const videos = [
   'https://res.cloudinary.com/demo/video/upload/v1651840278/samples/cld-sample-video.mp4',

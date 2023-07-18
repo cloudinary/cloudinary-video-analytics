@@ -1,1 +1,1 @@
-export { connectCloudinaryAnalytics } from './cloudinary-analytics';
+export { connectCloudinaryAnalytics as default } from './cloudinary-analytics';

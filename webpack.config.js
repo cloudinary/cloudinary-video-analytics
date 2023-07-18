@@ -12,12 +12,9 @@ module.exports = {
   entry: './src/index.js',
   output: {
     filename: `[name].js`,
-    chunkFilename: `[name].js`,
     path: path.resolve(__dirname, './dist'),
-    publicPath: 'auto',
     library: {
-      name: 'cloudinary-video-analytics',
-      type: 'umd'
+      type: 'commonjs2'
     }
   },
   module: {

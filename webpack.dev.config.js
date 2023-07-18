@@ -11,6 +11,12 @@ module.exports = {
     },
   },
   mode: 'development',
+  output: {
+    ...productionWebpackConfig.output,
+    library: {
+      type: 'umd'
+    }
+  },
   plugins: [
     new HtmlWebpackPlugin({
       inject: true,
