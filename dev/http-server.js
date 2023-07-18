@@ -26,7 +26,6 @@ const server = http.createServer(function(req, res) {
       }, {});
 
       events.push(parsedFields);
-      console.log(events);
     });
 
     res.writeHead(200);
@@ -37,6 +36,8 @@ const server = http.createServer(function(req, res) {
 
   res.writeHead(500);
 });
-server.listen(3001, 'localhost', () => {
-  console.log('Server is running on http://localhost:3001. Link to events - http://localhost:3001/events');
+
+const PORT = 3001;
+server.listen(PORT, 'localhost', () => {
+  console.log(`Server is running on http://localhost:${PORT}. Link to events - http://localhost:${PORT}/events`);
 });

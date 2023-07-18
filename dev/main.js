@@ -1,9 +1,8 @@
-import cloudinaryAnalytics from 'cloudinary-video-analytics';
-window.connectCloudinaryAnalytics = cloudinaryAnalytics;
+import connectCloudinaryAnalytics from 'cloudinary-video-analytics';
+window.connectCloudinaryAnalytics = connectCloudinaryAnalytics;
 
 const videos = [
   'https://res.cloudinary.com/demo/video/upload/v1651840278/samples/cld-sample-video.mp4',
-  'https://res.cloudinary.com/demo/video/upload/v1689428506/elephants_xdbpfa.mp4',
   'https://res.cloudinary.com/demo/video/upload/v1643890261/cld-sample-video.mp4',
 ];
 
@@ -40,13 +39,13 @@ window.addEventListener('load', () => {
   const extraVideo1CldAnalytics = connectCloudinaryAnalytics(extraVideo1Element);
   extraVideo1CldAnalytics.startManuallyNewVideoTracking({
     cloudName: 'demo',
-    publicId: videos[1],
+    publicId: videos[0],
   });
 
   const extraVideo2Element = document.querySelector('#extra-video-2');
   const extraVideo2CldAnalytics = connectCloudinaryAnalytics(extraVideo2Element);
   extraVideo2CldAnalytics.startManuallyNewVideoTracking({
     cloudName: 'demo',
-    publicId: videos[2],
+    publicId: videos[1],
   });
 });
