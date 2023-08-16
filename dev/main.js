@@ -4,16 +4,17 @@ window.connectCloudinaryAnalytics = connectCloudinaryAnalytics;
 const videos = [
   'https://res.cloudinary.com/demo/video/upload/v1651840278/samples/cld-sample-video.mp4',
   'https://res.cloudinary.com/demo/video/upload/v1643890261/cld-sample-video.mp4',
+  'https://res.cloudinary.com/demo/video/upload/v1692105601/dog_demo.mp4',
 ];
 
 window.addEventListener('load', () => {
-  const mainVideoElement = document.querySelector('#main-video-player');
-  const cloudinaryAnalytics = connectCloudinaryAnalytics(mainVideoElement);
+  const manualVideoElement = document.querySelector('#main-video-player');
+  const manualCloudinaryAnalytics = connectCloudinaryAnalytics(manualVideoElement);
   const connectVideoPanel = () => {
     let currentSelectedRadioValue = '0';
     const onMainVideoChange = (newVideoPublicId) => {
-      mainVideoElement.src = newVideoPublicId;
-      cloudinaryAnalytics.startManuallyNewVideoTracking({
+      manualVideoElement.src = newVideoPublicId;
+      manualCloudinaryAnalytics.startManuallyNewVideoTracking({
         cloudName: 'demo',
         publicId: newVideoPublicId,
       });
@@ -29,7 +30,7 @@ window.addEventListener('load', () => {
 
   // init
   connectVideoPanel();
-  cloudinaryAnalytics.startManuallyNewVideoTracking({
+  manualCloudinaryAnalytics.startManuallyNewVideoTracking({
     cloudName: 'demo',
     publicId: videos[0],
   });
@@ -48,4 +49,24 @@ window.addEventListener('load', () => {
     cloudName: 'demo',
     publicId: videos[1],
   });
+
+  // auto detection
+  const autoVideoElement = document.querySelector('#auto-video-player');
+  const autoCloudinaryAnalytics = connectCloudinaryAnalytics(autoVideoElement);
+  const connectAutoVideoPanel = () => {
+    let currentSelectedRadioValue = '0';
+    const onMainVideoChange = (newVideoPublicId) => {
+      autoVideoElement.src = newVideoPublicId;
+    };
+
+    document.addEventListener('input', (e) => {
+      if (e.target.getAttribute('name') === 'autoVideoType') {
+        currentSelectedRadioValue = e.target.value;
+        onMainVideoChange(videos[currentSelectedRadioValue] || '');
+      }
+    });
+  };
+
+  connectAutoVideoPanel();
+  autoCloudinaryAnalytics.autoTracking();
 });
