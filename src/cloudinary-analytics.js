@@ -2,10 +2,12 @@ import { metadataValidator } from './utils/metadata-validator';
 import { initEventsCollector } from './events-collector';
 import { getVideoSessionId } from './utils/video-session-id';
 import { getUserId } from './utils/user-id';
-import { setupDataCollector } from './data-collector';
+import { setupManualDataCollector } from './data-collectors/manual-data-collector';
+import { setupAutomaticDataCollector } from './data-collectors/automatic-data-collector';
 import { getVideoMetadata } from './utils/video-metadata';
 import { sendBeaconRequest } from './utils/send-beacon-request';
-import { parseVideoUrl } from './utils/parseVideoUrl';
+import { getVideoDeliveredFormat } from './utils/video-delivered-format';
+import { getVideoSource } from './utils/video-source';
 
 const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/video-analytics';
 const CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL = 'http://localhost:3001/events';
@@ -33,12 +35,13 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     }
 
     // start new tracking
-    const userId = getUserId();
     const videoWatchSessionId = getVideoSessionId();
     const videoWatchSessionEventCollector = createEventsCollector(videoWatchSessionId);
-    const dataCollectorRemoval = setupDataCollector({
+    const dataCollectorRemoval = setupManualDataCollector({
       ...metadata,
-      userId,
+      videoUrl: getVideoSource(videoElement),
+      videoDeliveredFormat: getVideoDeliveredFormat(videoElement),
+      userId: getUserId(),
       videoWatchSessionId,
       videoMetadata: getVideoMetadata(videoElement),
     }, videoWatchSessionEventCollector.flushEvents, sendData);
@@ -64,16 +67,23 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       }
 
       // start new tracking
-      const videoUrlParts = parseVideoUrl(sourceUrl);
+      const videoWatchSessionId = getVideoSessionId();
+      const videoWatchSessionEventCollector = createEventsCollector(videoWatchSessionId);
+      const dataCollectorRemoval = setupAutomaticDataCollector({
+        videoUrl: getVideoSource(videoElement),
+        videoDeliveredFormat: getVideoDeliveredFormat(videoElement),
+        userId: getUserId(),
+        videoWatchSessionId,
+        videoMetadata: getVideoMetadata(videoElement),
+      }, videoWatchSessionEventCollector.flushEvents, sendData);
 
-      if (!videoUrlParts) {
-        return null;
-      }
-
-      startManuallyNewVideoTracking({
-        cloudName: videoUrlParts.cloudName,
-        publicId: videoUrlParts.publicId,
-      });
+      videoTrackingSession = {
+        videoWatchSessionId,
+        clear: () => {
+          videoWatchSessionEventCollector.destroy();
+          dataCollectorRemoval();
+        },
+      };
     };
 
     videoElement.addEventListener('loadstart', onNewVideoSource);

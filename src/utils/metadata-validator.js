@@ -1,9 +1,4 @@
-const DEFAULT_REQUIRED_METADATA_FIELDS = {
-  cloudName: true,
-  publicId: true,
-};
-
-export const metadataValidator = (metadata, required = DEFAULT_REQUIRED_METADATA_FIELDS) => {
+export const metadataValidator = (metadata) => {
   if (typeof metadata !== 'object') {
     return {
       isValid: false,
@@ -11,14 +6,14 @@ export const metadataValidator = (metadata, required = DEFAULT_REQUIRED_METADATA
     };
   }
 
-  if (typeof metadata.cloudName !== 'string' && required.cloudName) {
+  if (typeof metadata.cloudName !== 'string') {
     return {
       isValid: false,
       errorMessage: 'You need to provide proper cloud name of your Cloudinary account [cloudName: string]',
     };
   }
 
-  if (typeof metadata.publicId !== 'string' && required.publicId) {
+  if (typeof metadata.publicId !== 'string') {
     return {
       isValid: false,
       errorMessage: 'You need to provide proper video public ID of your video on your Cloudinary cloud [videoPublicId: string]',
