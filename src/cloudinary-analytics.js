@@ -6,7 +6,6 @@ import { setupManualDataCollector } from './data-collectors/manual-data-collecto
 import { setupAutomaticDataCollector } from './data-collectors/automatic-data-collector';
 import { getVideoMetadata } from './utils/video-metadata';
 import { sendBeaconRequest } from './utils/send-beacon-request';
-import { getVideoDeliveredFormat } from './utils/video-delivered-format';
 import { getVideoSource } from './utils/video-source';
 
 const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/video-analytics';
@@ -40,7 +39,6 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     const dataCollectorRemoval = setupManualDataCollector({
       ...metadata,
       videoUrl: getVideoSource(videoElement),
-      videoDeliveredFormat: getVideoDeliveredFormat(videoElement),
       userId: getUserId(),
       videoWatchSessionId,
       videoMetadata: getVideoMetadata(videoElement),
@@ -71,7 +69,6 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       const videoWatchSessionEventCollector = createEventsCollector(videoWatchSessionId);
       const dataCollectorRemoval = setupAutomaticDataCollector({
         videoUrl: getVideoSource(videoElement),
-        videoDeliveredFormat: getVideoDeliveredFormat(videoElement),
         userId: getUserId(),
         videoWatchSessionId,
         videoMetadata: getVideoMetadata(videoElement),
