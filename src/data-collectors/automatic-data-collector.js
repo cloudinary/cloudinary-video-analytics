@@ -52,7 +52,7 @@ export const setupAutomaticDataCollector = (data, flushEvents, sendData) => {
       videoUrl: data.videoUrl,
       videoDeliveredFormat: data.videoDeliveredFormat,
       videoPublicId: data.publicId,
-      videoWatchSessionId: data.videoWatchSessionId, // new property
+      videoWatchSessionId: data.videoWatchSessionId,
       playedTimeSeconds,
       videoDuration: data.videoMetadata.videoDuration,
     });

@@ -54,7 +54,7 @@ export const setupManualDataCollector = (data, flushEvents, sendData) => {
       userId: data.userId,
       cloudName: data.cloudName,
       videoPublicId: data.publicId,
-      videoWatchSessionId: data.videoWatchSessionId, // new property
+      videoWatchSessionId: data.videoWatchSessionId,
       playedTimeSeconds,
       videoDuration: data.videoMetadata.videoDuration,
     });
