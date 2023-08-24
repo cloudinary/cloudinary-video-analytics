@@ -1,6 +1,6 @@
 import { metadataValidator } from './utils/metadata-validator';
 import { initEventsCollector } from './events-collector';
-import { getVideoSessionId } from './utils/video-session-id';
+import { getVideoViewId } from './utils/video-view-id';
 import { getUserId } from './utils/user-id';
 import { setupManualDataCollector } from './data-collectors/manual-data-collector';
 import { setupAutomaticDataCollector } from './data-collectors/automatic-data-collector';
@@ -34,18 +34,18 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     }
 
     // start new tracking
-    const videoWatchSessionId = getVideoSessionId();
-    const videoWatchSessionEventCollector = createEventsCollector(videoWatchSessionId);
+    const viewId = getVideoViewId();
+    const videoWatchSessionEventCollector = createEventsCollector(viewId);
     const dataCollectorRemoval = setupManualDataCollector({
       ...metadata,
       videoUrl: getVideoSource(videoElement),
       userId: getUserId(),
-      videoWatchSessionId,
+      viewId,
       videoMetadata: getVideoMetadata(videoElement),
     }, videoWatchSessionEventCollector.flushEvents, sendData);
 
     videoTrackingSession = {
-      videoWatchSessionId,
+      viewId,
       clear: () => {
         videoWatchSessionEventCollector.destroy();
         dataCollectorRemoval();
@@ -65,17 +65,17 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       }
 
       // start new tracking
-      const videoWatchSessionId = getVideoSessionId();
-      const videoWatchSessionEventCollector = createEventsCollector(videoWatchSessionId);
+      const viewId = getVideoViewId();
+      const videoWatchSessionEventCollector = createEventsCollector(viewId);
       const dataCollectorRemoval = setupAutomaticDataCollector({
         videoUrl: getVideoSource(videoElement),
         userId: getUserId(),
-        videoWatchSessionId,
+        viewId,
         videoMetadata: getVideoMetadata(videoElement),
       }, videoWatchSessionEventCollector.flushEvents, sendData);
 
       videoTrackingSession = {
-        videoWatchSessionId,
+        viewId,
         clear: () => {
           videoWatchSessionEventCollector.destroy();
           dataCollectorRemoval();

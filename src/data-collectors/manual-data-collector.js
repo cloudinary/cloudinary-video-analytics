@@ -50,11 +50,10 @@ export const setupManualDataCollector = (data, flushEvents, sendData) => {
 
     sendData({
       videoUrl: data.videoUrl,
-      videoDeliveredFormat: data.videoDeliveredFormat,
       userId: data.userId,
       cloudName: data.cloudName,
       videoPublicId: data.publicId,
-      videoWatchSessionId: data.videoWatchSessionId,
+      viewId: data.viewId,
       playedTimeSeconds,
       videoDuration: data.videoMetadata.videoDuration,
     });
