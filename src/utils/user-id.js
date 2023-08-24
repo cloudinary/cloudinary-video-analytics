@@ -9,7 +9,7 @@ export const getUserId = () => {
     return storageUserId;
   }
 
-  const userId = uuidv4();
+  const userId = uuidv4().replace(/-/g, '');
   window.localStorage.setItem(CLD_ANALYTICS_USER_ID_KEY, userId);
   return userId;
 };

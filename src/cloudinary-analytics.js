@@ -1,10 +1,12 @@
 import { metadataValidator } from './utils/metadata-validator';
 import { initEventsCollector } from './events-collector';
-import { getVideoSessionId } from './utils/video-session-id';
+import { getVideoViewId } from './utils/video-view-id';
 import { getUserId } from './utils/user-id';
-import { setupDataCollector } from './data-collector';
+import { setupManualDataCollector } from './data-collectors/manual-data-collector';
+import { setupAutomaticDataCollector } from './data-collectors/automatic-data-collector';
 import { getVideoMetadata } from './utils/video-metadata';
 import { sendBeaconRequest } from './utils/send-beacon-request';
+import { getVideoSource } from './utils/video-source';
 
 const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/video-analytics';
 const CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL = 'http://localhost:3001/events';
@@ -21,6 +23,10 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       throw `Cloudinary video analytics tracking called without necessary data (${metadataValidationResult.errorMessage})`;
     }
 
+    if (videoTrackingSession) {
+      throw `Cloudinary video analytics tracking is already connected with this HTML Video Element`;
+    }
+
     // clear previous tracking
     if (videoTrackingSession) {
       videoTrackingSession.clear();
@@ -28,18 +34,18 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     }
 
     // start new tracking
-    const userId = getUserId();
-    const videoWatchSessionId = getVideoSessionId();
-    const videoWatchSessionEventCollector = createEventsCollector(videoWatchSessionId);
-    const dataCollectorRemoval = setupDataCollector({
+    const viewId = getVideoViewId();
+    const videoWatchSessionEventCollector = createEventsCollector(viewId);
+    const dataCollectorRemoval = setupManualDataCollector({
       ...metadata,
-      userId,
-      videoWatchSessionId,
+      videoUrl: getVideoSource(videoElement),
+      userId: getUserId(),
+      viewId,
       videoMetadata: getVideoMetadata(videoElement),
     }, videoWatchSessionEventCollector.flushEvents, sendData);
 
     videoTrackingSession = {
-      videoWatchSessionId,
+      viewId,
       clear: () => {
         videoWatchSessionEventCollector.destroy();
         dataCollectorRemoval();
@@ -47,7 +53,52 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     };
   };
 
+  const autoTracking = () => {
+    if (videoTrackingSession) {
+      throw `Cloudinary video analytics tracking is already connected with this HTML Video Element`;
+    }
+
+    const onNewVideoSource = () => {
+      const sourceUrl = videoElement.src;
+      if (sourceUrl === window.location.href || !sourceUrl) {
+        return null;
+      }
+
+      // start new tracking
+      const viewId = getVideoViewId();
+      const videoWatchSessionEventCollector = createEventsCollector(viewId);
+      const dataCollectorRemoval = setupAutomaticDataCollector({
+        videoUrl: getVideoSource(videoElement),
+        userId: getUserId(),
+        viewId,
+        videoMetadata: getVideoMetadata(videoElement),
+      }, videoWatchSessionEventCollector.flushEvents, sendData);
+
+      videoTrackingSession = {
+        viewId,
+        clear: () => {
+          videoWatchSessionEventCollector.destroy();
+          dataCollectorRemoval();
+        },
+      };
+    };
+
+    videoElement.addEventListener('loadstart', onNewVideoSource);
+    videoElement.addEventListener('emptied', () => {
+      if (!videoTrackingSession) {
+        return null;
+      }
+
+      videoTrackingSession.clear();
+      videoTrackingSession = null;
+    });
+
+    // start tracking for initial video
+    onNewVideoSource();
+  };
+
   return {
     startManuallyNewVideoTracking,
+    autoTracking,
   };
 };

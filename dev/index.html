@@ -58,6 +58,10 @@
           <input type="radio" name="videoType" value="1">
           <img src="https://res.cloudinary.com/demo/video/upload/v1643890261/cld-sample-video.jpg" alt="Option 2">
         </label>
+        <label>
+          <input type="radio" name="videoType" value="2">
+          <img src="https://res.cloudinary.com/demo/video/upload/v1692105601/dog_demo.jpg" alt="Option 3">
+        </label>
       </div>
     </div>
     <div class="col-9">
@@ -94,6 +98,48 @@
   </div>
 
   <br/><br/><br/>
+
+  <br/><br/><br/>
+  <h2 class="text-center">AUTOMATIC DETECTION</h2>
+  <br/><br/><br/>
+
+  <div class="row">
+    <div class="col-3">
+
+      <strong>Change video source</strong>
+      <br/><br/>
+      <div>
+        <label>
+          <input type="radio" name="autoVideoType" value="0" checked>
+          <img src="https://res.cloudinary.com/demo/video/upload/v1651840278/samples/cld-sample-video.jpg" alt="Option 1">
+        </label>
+        <label>
+          <input type="radio" name="autoVideoType" value="1">
+          <img src="https://res.cloudinary.com/demo/video/upload/v1643890261/cld-sample-video.jpg" alt="Option 2">
+        </label>
+        <label>
+          <input type="radio" name="autoVideoType" value="2">
+          <img src="https://res.cloudinary.com/demo/video/upload/v1692105601/dog_demo.jpg" alt="Option 3">
+        </label>
+        <label>
+          <input type="radio" name="autoVideoType" value="3">
+          CUSTOM
+        </label>
+        <label>
+          <input type="radio" name="autoVideoType" value="4">
+          EMPTY
+        </label>
+      </div>
+    </div>
+    <div class="col-9">
+      <video
+          id="auto-video-player"
+          src="https://res.cloudinary.com/demo/video/upload/v1651840278/samples/cld-sample-video.mp4"
+          controls
+      >
+      </video>
+    </div>
+  </div>
 
 </div>
 </body>

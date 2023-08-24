@@ -1,4 +1,4 @@
-import { VIDEO_EVENT } from './events.consts';
+import { VIDEO_EVENT } from '../events.consts';
 
 // prepare events list for aggregation, for example
 // if video is being played and user wants to leave the page - add "pause" event to correctly calculate played time
@@ -41,7 +41,7 @@ const getPlayedTimeSeconds = (watchedFrames) => {
     return acc + ((pauseTime - playTime) / 1000);
   }, 0));
 };
-export const setupLegacyDataCollector = (data, flushEvents, sendData) => {
+export const setupManualDataCollector = (data, flushEvents, sendData) => {
   const sendVideoData = () => {
     const collectedEvents = flushEvents();
     const events = prepareEvents(collectedEvents);
@@ -49,10 +49,11 @@ export const setupLegacyDataCollector = (data, flushEvents, sendData) => {
     const playedTimeSeconds = getPlayedTimeSeconds(watchedFrames);
 
     sendData({
+      videoUrl: data.videoUrl,
       userId: data.userId,
       cloudName: data.cloudName,
       videoPublicId: data.publicId,
-      videoWatchSessionId: data.videoWatchSessionId, // new property
+      viewId: data.viewId,
       playedTimeSeconds,
       videoDuration: data.videoMetadata.videoDuration,
     });
