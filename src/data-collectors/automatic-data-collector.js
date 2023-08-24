@@ -50,7 +50,7 @@ export const setupAutomaticDataCollector = (data, flushEvents, sendData) => {
 
     sendData({
       videoUrl: data.videoUrl,
-      videoPublicId: data.publicId,
+      userId: data.userId,
       viewId: data.viewId,
       playedTimeSeconds,
       videoDuration: data.videoMetadata.videoDuration,
