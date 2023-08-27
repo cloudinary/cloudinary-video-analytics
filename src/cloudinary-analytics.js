@@ -60,7 +60,7 @@ export const connectCloudinaryAnalytics = (videoElement) => {
 
     const onNewVideoSource = () => {
       const sourceUrl = videoElement.src;
-      if (sourceUrl === window.location.href || !sourceUrl) {
+      if (sourceUrl === window.location.href || !sourceUrl || videoTrackingSession) {
         return null;
       }
 
