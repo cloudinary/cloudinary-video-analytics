@@ -23,10 +23,6 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       throw `Cloudinary video analytics tracking called without necessary data (${metadataValidationResult.errorMessage})`;
     }
 
-    if (videoTrackingSession) {
-      throw `Cloudinary video analytics tracking is already connected with this HTML Video Element`;
-    }
-
     // clear previous tracking
     if (videoTrackingSession) {
       videoTrackingSession.clear();
@@ -60,7 +56,7 @@ export const connectCloudinaryAnalytics = (videoElement) => {
 
     const onNewVideoSource = () => {
       const sourceUrl = videoElement.src;
-      if (sourceUrl === window.location.href || !sourceUrl || videoTrackingSession) {
+      if (sourceUrl === window.location.href || !sourceUrl) {
         return null;
       }
 
@@ -83,7 +79,11 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       };
     };
 
-    videoElement.addEventListener('loadstart', onNewVideoSource);
+    videoElement.addEventListener('loadstart', () => {
+      if (!videoTrackingSession) {
+        onNewVideoSource();
+      }
+    });
     videoElement.addEventListener('emptied', () => {
       if (!videoTrackingSession) {
         return null;
