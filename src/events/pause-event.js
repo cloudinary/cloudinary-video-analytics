@@ -2,15 +2,11 @@ import { VIDEO_EVENT } from '../events.consts';
 
 export const registerPauseEvent = (videoElement, reportEvent) => {
   const pauseEventListener = () => {
-    reportEvent(VIDEO_EVENT.PAUSE, {
-      time: Date.now(),
-    });
+    reportEvent(VIDEO_EVENT.PAUSE, {});
   };
   videoElement.addEventListener('pause', pauseEventListener);
   const emptiedEventListener = () => {
-    reportEvent(VIDEO_EVENT.PAUSE, {
-      time: Date.now(),
-    });
+    reportEvent(VIDEO_EVENT.PAUSE, {});
   };
   videoElement.addEventListener('emptied', emptiedEventListener);
 
