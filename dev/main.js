@@ -30,7 +30,7 @@ window.addEventListener('load', () => {
 
   // init
   connectVideoPanel();
-  manualCloudinaryAnalytics.startManuallyNewVideoTracking({
+  manualCloudinaryAnalytics.manualTracking({
     cloudName: 'demo',
     publicId: videos[0],
   });
@@ -38,14 +38,14 @@ window.addEventListener('load', () => {
   // connect extra videos
   const extraVideo1Element = document.querySelector('#extra-video-1');
   const extraVideo1CldAnalytics = connectCloudinaryAnalytics(extraVideo1Element);
-  extraVideo1CldAnalytics.startManuallyNewVideoTracking({
+  extraVideo1CldAnalytics.manualTracking({
     cloudName: 'demo',
     publicId: videos[0],
   });
 
   const extraVideo2Element = document.querySelector('#extra-video-2');
   const extraVideo2CldAnalytics = connectCloudinaryAnalytics(extraVideo2Element);
-  extraVideo2CldAnalytics.startManuallyNewVideoTracking({
+  extraVideo2CldAnalytics.manualTracking({
     cloudName: 'demo',
     publicId: videos[1],
   });

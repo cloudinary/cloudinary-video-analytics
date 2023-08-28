@@ -5,6 +5,7 @@ import { getUserId } from './utils/user-id';
 import { setupDefaultDataCollector } from './default-data-collector';
 import { sendBeaconRequest } from './utils/send-beacon-request';
 import { getVideoSource } from './utils/video-source';
+import { createViewStartEvent } from './utils/base-events';
 
 const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/video-analytics';
 const CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL = 'http://localhost:3001/events';

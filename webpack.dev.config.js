@@ -1,9 +1,9 @@
 const path = require('path');
+const { merge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const productionWebpackConfig = require('./webpack.config');
 
-module.exports = {
-  ...productionWebpackConfig,
+module.exports = merge(productionWebpackConfig, {
   entry: './dev/main.js',
   resolve: {
     alias: {
@@ -21,7 +21,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: true,
       template: path.resolve(__dirname, './dev/index.html')
-    })
+    }),
   ],
   devServer: {
     host: 'localhost',
@@ -32,4 +32,4 @@ module.exports = {
       'Access-Control-Allow-Headers': '*'
     }
   }
-};
+});

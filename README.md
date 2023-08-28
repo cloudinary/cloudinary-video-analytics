@@ -27,7 +27,7 @@ const videoElement = document.getElementById('video-player');
 const cloudinaryAnalytics = connectCloudinaryAnalytics(videoElement);
 
 // needs to be called every time new video is loaded
-cloudinaryAnalytics.startManuallyNewVideoTracking({
+cloudinaryAnalytics.manualTracking({
   cloudName: 'demo',
   publicId: 'cld-sample',
 });
@@ -35,7 +35,7 @@ cloudinaryAnalytics.startManuallyNewVideoTracking({
 
 ### **Important note**
 
-Every time you load new video to specific video element you need to call again `cloudinaryAnalytics.startManuallyNewVideoTracking` method as shown above.
+Every time you load new video to specific video element you need to call again `cloudinaryAnalytics.manualTracking` method as shown above.
 It will close last tracking, send all events of last video & create new watching session.
 
 ### Metadata Props
