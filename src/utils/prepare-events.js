@@ -1,8 +1,7 @@
-import { VIEW_EVENT } from '../events.consts';
-import { createEvent } from './create-event';
+import { createViewEndEvent } from './base-events';
 
 export const prepareEvents = (collectedEvents) => {
   const events = [...collectedEvents];
-  events.push(createEvent(VIEW_EVENT.END, {}));
+  events.push(createViewEndEvent());
   return JSON.stringify(events);
 };

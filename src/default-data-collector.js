@@ -1,6 +1,6 @@
-import { prepareEvents } from '../utils/prepare-events';
+import { prepareEvents } from './utils/prepare-events';
 
-export const setupAutomaticDataCollector = (data, flushEvents, sendData) => {
+export const setupDefaultDataCollector = (data, flushEvents, sendData) => {
   const sendVideoData = () => {
     const collectedEvents = flushEvents();
     const events = prepareEvents(collectedEvents);

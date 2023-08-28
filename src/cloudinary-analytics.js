@@ -2,24 +2,19 @@ import { metadataValidator } from './utils/metadata-validator';
 import { initEventsCollector } from './events-collector';
 import { getVideoViewId } from './utils/video-view-id';
 import { getUserId } from './utils/user-id';
-import { setupManualDataCollector } from './data-collectors/manual-data-collector';
-import { setupAutomaticDataCollector } from './data-collectors/automatic-data-collector';
+import { setupDefaultDataCollector } from './default-data-collector';
 import { sendBeaconRequest } from './utils/send-beacon-request';
 import { getVideoSource } from './utils/video-source';
-import { createEvent } from './utils/create-event';
-import { VIEW_EVENT } from './events.consts';
-import { isCustomerDataValid, parseCustomerData } from './utils/customer-data';
 
 const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/video-analytics';
 const CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL = 'http://localhost:3001/events';
 const CLD_ANALYTICS_ENDPOINT_URL = process.env.NODE_ENV === 'development' ? CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL : CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL;
-const ANALYTICS_VERSION = '1.0.0';
 
 export const connectCloudinaryAnalytics = (videoElement) => {
   let videoTrackingSession = null;
   const createEventsCollector = initEventsCollector(videoElement);
   const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT_URL, data);
-  const manualTracking = (metadata) => {
+  const manualTracking = (metadata, options = {}) => {
     // validate if user provided all necessary metadata (cloud name, public id)
     const metadataValidationResult = metadataValidator(metadata);
     if (!metadataValidationResult.isValid) {
@@ -38,9 +33,12 @@ export const connectCloudinaryAnalytics = (videoElement) => {
 
     // start new tracking
     const viewId = getVideoViewId();
-    const videoViewEventCollector = createEventsCollector(viewId);
-    const dataCollectorRemoval = setupManualDataCollector({
-      ...metadata,
+    const sourceUrl = getVideoSource(videoElement);
+    const viewStartEvent = createViewStartEvent(sourceUrl, {
+      trackingType: 'manual',
+    }, options);
+    const videoViewEventCollector = createEventsCollector(viewId, viewStartEvent);
+    const dataCollectorRemoval = setupDefaultDataCollector({
       userId: getUserId(),
       viewId,
       analyticsModuleVersion: ANALYTICS_VERSION,
@@ -61,27 +59,18 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     }
 
     const onNewVideoSource = () => {
-      const sourceUrl = videoElement.src;
+      const sourceUrl = getVideoSource(videoElement);
       if (sourceUrl === window.location.href || !sourceUrl) {
         return null;
       }
 
-      // start event
-      const customerData = parseCustomerData(options?.customData);
-      const isValidCustomerData = isCustomerDataValid(customerData);
-      const customerVideoData = parseCustomerVideoData(options.fallback(sourceUrl));
-      const viewStartEvent = createEvent(VIEW_EVENT.START, {
-        videoUrl: getVideoSource(videoElement),
-        customerData: {
-          ...(isValidCustomerData ? { customerData } : {}),
-          ...(customerVideoData ),
-        },
-      });
-
       // start new tracking
       const viewId = getVideoViewId();
+      const viewStartEvent = createViewStartEvent(sourceUrl, {
+        trackingType: 'auto',
+      }, options);
       const videoViewEventCollector = createEventsCollector(viewId, viewStartEvent);
-      const dataCollectorRemoval = setupAutomaticDataCollector({
+      const dataCollectorRemoval = setupDefaultDataCollector({
         userId: getUserId(),
         viewId,
         analyticsModuleVersion: ANALYTICS_VERSION,

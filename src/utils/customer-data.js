@@ -29,3 +29,32 @@ export const isCustomerDataValid = (customerData) => {
 
   return true;
 };
+
+export const useCustomerVideoDataFallback = (videoUrl, fallback) => {
+  try {
+    const result = fallback(videoUrl);
+    return {
+      cloudName: result.cloudName,
+      publicId: result.publicId,
+    };
+  } catch (e) {
+    return null;
+  }
+};
+
+export const parseCustomerVideoData = (data) => {
+  if (
+    typeof data === 'object' &&
+    typeof data.cloudName === 'string' &&
+    data.cloudName &&
+    typeof data.publicId === 'string' &&
+    data.publicId
+  ) {
+    return {
+      cloudName: data.cloudName,
+      publicId: data.publicId,
+    };
+  }
+
+  return null;
+};
