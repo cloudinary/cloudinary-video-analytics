@@ -5,7 +5,7 @@ import { VIEW_EVENT } from '../events.consts';
 export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
   const customerData = parseCustomerData(customerOptions?.customData);
   const isValidCustomerData = isCustomerDataValid(customerData);
-  const customerVideoDataFromFallback = customerOptions?.fallback ? useCustomerVideoDataFallback(sourceUrl, customerOptions.fallback) : null;
+  const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(sourceUrl, customerOptions.customVideoUrlFallback) : null;
   const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
   return createEvent(VIEW_EVENT.START, {
     videoUrl: sourceUrl,

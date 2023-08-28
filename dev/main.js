@@ -14,7 +14,7 @@ window.addEventListener('load', () => {
     let currentSelectedRadioValue = '0';
     const onMainVideoChange = (newVideoPublicId) => {
       manualVideoElement.src = newVideoPublicId;
-      manualCloudinaryAnalytics.startManuallyNewVideoTracking({
+      manualCloudinaryAnalytics.manualTracking({
         cloudName: 'demo',
         publicId: newVideoPublicId,
       });
@@ -68,5 +68,22 @@ window.addEventListener('load', () => {
   };
 
   connectAutoVideoPanel();
-  autoCloudinaryAnalytics.autoTracking();
+  autoCloudinaryAnalytics.autoTracking({
+    customData: {
+      example: 1,
+      thisPackageIsAwesome: true,
+      test: 'test',
+      thisShouldBeSkipped: {
+        value: 1,
+      },
+    },
+    customVideoUrlFallback: (videoUrl) => {
+      if (videoUrl === 'https://res.cloudinary.com/demo/video/upload/v1692105601/dog_demo.mp4') {
+        return {
+          cloudName: 'fallback-cloud-name',
+          publicId: 'fallback-public-id',
+        };
+      }
+    },
+  });
 });

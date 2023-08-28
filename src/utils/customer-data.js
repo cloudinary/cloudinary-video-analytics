@@ -4,14 +4,14 @@ const CUSTOMER_DATA_CHARS_LIMIT = 1000;
 export const parseCustomerData = (data) => {
   if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
     const parsedData = Object.keys(data).reduce((collection, dataKey) => {
-      if (ALLOWED_DATA_TYPES.includes(data[dataKey])) {
+      if (ALLOWED_DATA_TYPES.includes(typeof data[dataKey]) || data[dataKey] === null) {
         collection[dataKey] = data[dataKey];
       }
 
       return collection;
     }, {});
 
-    return Object.keys(parsedData) > 0 ? parsedData : null;
+    return Object.keys(parsedData).length > 0 ? parsedData : null;
   }
 
   return null;
