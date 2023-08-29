@@ -1,5 +1,6 @@
 import { registerPlayEvent } from './events/play-event';
 import { registerPauseEvent } from './events/pause-event';
+import { registerMetadataEvent } from './events/metadata-event';
 
 export const initEventsCollector = (videoElement) => {
   const collectedEvents = {};
@@ -21,6 +22,7 @@ export const initEventsCollector = (videoElement) => {
     const registeredEvents = [
       registerPlayEvent(videoElement, reportEvent),
       registerPauseEvent(videoElement, reportEvent),
+      registerMetadataEvent(videoElement, reportEvent),
     ];
     const flushEvents = () => {
       const events = videoWatchSessionRawEvents.splice(0, videoWatchSessionRawEvents.length);

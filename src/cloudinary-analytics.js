@@ -4,7 +4,6 @@ import { getVideoViewId } from './utils/video-view-id';
 import { getUserId } from './utils/user-id';
 import { setupManualDataCollector } from './data-collectors/manual-data-collector';
 import { setupAutomaticDataCollector } from './data-collectors/automatic-data-collector';
-import { getVideoMetadata } from './utils/video-metadata';
 import { sendBeaconRequest } from './utils/send-beacon-request';
 import { getVideoSource } from './utils/video-source';
 
@@ -37,7 +36,6 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       videoUrl: getVideoSource(videoElement),
       userId: getUserId(),
       viewId,
-      videoMetadata: getVideoMetadata(videoElement),
     }, videoWatchSessionEventCollector.flushEvents, sendData);
 
     videoTrackingSession = {
@@ -67,7 +65,6 @@ export const connectCloudinaryAnalytics = (videoElement) => {
         videoUrl: getVideoSource(videoElement),
         userId: getUserId(),
         viewId,
-        videoMetadata: getVideoMetadata(videoElement),
       }, videoWatchSessionEventCollector.flushEvents, sendData);
 
       videoTrackingSession = {
