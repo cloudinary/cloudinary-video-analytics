@@ -11,10 +11,11 @@ module.exports = {
   },
   entry: './src/index.js',
   output: {
+    clean: true,
     filename: `[name].js`,
     path: path.resolve(__dirname, './dist'),
     library: {
-      type: 'commonjs2'
+      type: 'umd',
     }
   },
   module: {
