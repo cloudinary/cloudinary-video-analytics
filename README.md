@@ -34,7 +34,7 @@ cloudinaryAnalytics.startManualTracking({
 })
 ```
 
-Auto and manual tracking cannot be used together for same video element. Manual tracking should only be used in cases where you need to track certain videos, you want to track a video tag element which is dynamic, or you have custom domains which require providing `cloudName` and `publicId`.
+Auto and manual tracking cannot be used together for the same video element. Manual tracking should only be used in cases where you need to track certain videos, you want to track a video tag element which is dynamic, or you have custom domains which require providing `cloudName` and `publicId`.
 
 ### CodeSandbox examples
 [Native HTML Video Tag - Auto tracking](https://4rqcfc.csb.app/src/native-html-auto-tracking/index.html)
