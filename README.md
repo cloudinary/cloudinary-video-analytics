@@ -1,5 +1,5 @@
 # Cloudinary Video Analytics
-The Cloudinary Video Analytics package allows you to track analytics for your Cloudinary videos using video players other than the Cloudinary Video Player. The library targets the HTML5 video tag and is designed to work with any other video players that use this tag. For more information view the [documentation](https://cloudinary.com/documentation/video_analytics).
+The Cloudinary Video Analytics package allows you to track analytics for your Cloudinary videos using video players other than the Cloudinary Video Player. The library targets the HTML5 video tag and is designed to work with any video player that use this tag. For more information view the [documentation](https://cloudinary.com/documentation/video_analytics).
 
 ### Usage
 **1. Install the package**:
