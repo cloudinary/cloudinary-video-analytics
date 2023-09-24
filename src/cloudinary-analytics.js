@@ -15,18 +15,14 @@ export const connectCloudinaryAnalytics = (videoElement) => {
   let videoTrackingSession = null;
   const createEventsCollector = initEventsCollector(videoElement);
   const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT_URL, data);
-  const manualTracking = (metadata, options = {}) => {
+  const startManualTracking = (metadata, options = {}) => {
     // validate if user provided all necessary metadata (cloud name, public id)
     const metadataValidationResult = metadataValidator(metadata);
     if (!metadataValidationResult.isValid) {
       throw `Cloudinary video analytics tracking called without necessary data (${metadataValidationResult.errorMessage})`;
     }
 
-    // clear previous tracking
-    if (videoTrackingSession) {
-      videoTrackingSession.clear();
-      videoTrackingSession = null;
-    }
+    stopManualTracking();
 
     // start new tracking
     const viewId = getVideoViewId();
@@ -50,7 +46,15 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     };
   };
 
-  const autoTracking = (options = {}) => {
+  const stopManualTracking = () => {
+    // clear previous tracking
+    if (videoTrackingSession) {
+      videoTrackingSession.clear();
+      videoTrackingSession = null;
+    }
+  };
+
+  const startAutoTracking = (options = {}) => {
     if (videoTrackingSession) {
       throw `Cloudinary video analytics tracking is already connected with this HTML Video Element`;
     }
@@ -101,7 +105,8 @@ export const connectCloudinaryAnalytics = (videoElement) => {
   };
 
   return {
-    manualTracking,
-    autoTracking,
+    startManualTracking,
+    stopManualTracking,
+    startAutoTracking,
   };
 };
