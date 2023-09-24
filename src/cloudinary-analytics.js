@@ -15,6 +15,12 @@ export const connectCloudinaryAnalytics = (videoElement) => {
   let videoTrackingSession = null;
   const createEventsCollector = initEventsCollector(videoElement);
   const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT_URL, data);
+  const clearVideoTracking = () => {
+    if (videoTrackingSession) {
+      videoTrackingSession.clear();
+      videoTrackingSession = null;
+    }
+  };
   const startManualTracking = (metadata, options = {}) => {
     // validate if user provided all necessary metadata (cloud name, public id)
     const metadataValidationResult = metadataValidator(metadata);
@@ -22,7 +28,11 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       throw `Cloudinary video analytics tracking called without necessary data (${metadataValidationResult.errorMessage})`;
     }
 
-    stopManualTracking();
+    if (options && typeof options !== 'object') {
+      throw `Options property must be an object`;
+    }
+
+    clearVideoTracking();
 
     // start new tracking
     const viewId = getVideoViewId();
@@ -34,7 +44,6 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     const dataCollectorRemoval = setupDefaultDataCollector({
       userId: getUserId(),
       viewId,
-      analyticsModuleVersion: ANALYTICS_VERSION,
     }, videoViewEventCollector.flushEvents, sendData);
 
     videoTrackingSession = {
@@ -46,17 +55,13 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     };
   };
 
-  const stopManualTracking = () => {
-    // clear previous tracking
-    if (videoTrackingSession) {
-      videoTrackingSession.clear();
-      videoTrackingSession = null;
-    }
-  };
-
   const startAutoTracking = (options = {}) => {
     if (videoTrackingSession) {
       throw `Cloudinary video analytics tracking is already connected with this HTML Video Element`;
+    }
+
+    if (options && typeof options !== 'object') {
+      throw `Options property must be an object`;
     }
 
     const onNewVideoSource = () => {
@@ -74,7 +79,6 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       const dataCollectorRemoval = setupDefaultDataCollector({
         userId: getUserId(),
         viewId,
-        analyticsModuleVersion: ANALYTICS_VERSION,
       }, videoViewEventCollector.flushEvents, sendData);
 
       videoTrackingSession = {
@@ -92,12 +96,7 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       }
     });
     videoElement.addEventListener('emptied', () => {
-      if (!videoTrackingSession) {
-        return null;
-      }
-
-      videoTrackingSession.clear();
-      videoTrackingSession = null;
+      clearVideoTracking();
     });
 
     // start tracking for initial video
@@ -106,7 +105,7 @@ export const connectCloudinaryAnalytics = (videoElement) => {
 
   return {
     startManualTracking,
-    stopManualTracking,
+    stopManualTracking: clearVideoTracking,
     startAutoTracking,
   };
 };

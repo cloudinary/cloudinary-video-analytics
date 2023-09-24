@@ -1,7 +1,7 @@
 const ALLOWED_DATA_TYPES = ['string', 'number', 'boolean'];
 const CUSTOMER_DATA_CHARS_LIMIT = 1000;
 
-export const parseCustomerData = (data) => {
+export const parseProvidedData = (data) => {
   if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
     const parsedData = Object.keys(data).reduce((collection, dataKey) => {
       if (ALLOWED_DATA_TYPES.includes(typeof data[dataKey]) || data[dataKey] === null) {
@@ -17,17 +17,13 @@ export const parseCustomerData = (data) => {
   return null;
 };
 
-export const isCustomerDataValid = (customerData) => {
-  if (customerData === null) {
+export const isProvidedDataValid = (providedData) => {
+  if (providedData === null) {
     return false;
   }
 
-  const stringifiedValue = JSON.stringify(customerData);
-  if (stringifiedValue.length > CUSTOMER_DATA_CHARS_LIMIT) {
-    return false;
-  }
-
-  return true;
+  const stringifiedValue = JSON.stringify(providedData);
+  return stringifiedValue.length <= CUSTOMER_DATA_CHARS_LIMIT;
 };
 
 export const useCustomerVideoDataFallback = (videoUrl, fallback) => {

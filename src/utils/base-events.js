@@ -1,17 +1,20 @@
-import { isCustomerDataValid, parseCustomerData, parseCustomerVideoData, useCustomerVideoDataFallback } from './customer-data';
+import { isProvidedDataValid, parseProvidedData, parseCustomerVideoData, useCustomerVideoDataFallback } from './customer-data';
 import { createEvent } from './create-event';
+import { getVideoPlayerType } from './get-video-player-type';
 import { VIEW_EVENT } from '../events.consts';
 
 export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
-  const customerData = parseCustomerData(customerOptions?.customData);
-  const isValidCustomerData = isCustomerDataValid(customerData);
+  const providedData = parseProvidedData(customerOptions?.providedData);
+  const isValidProvidedData = isProvidedDataValid(providedData);
   const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(sourceUrl, customerOptions.customVideoUrlFallback) : null;
   const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
   return createEvent(VIEW_EVENT.START, {
     videoUrl: sourceUrl,
+    analyticsModuleVersion: ANALYTICS_VERSION,
+    videoPlayerType: getVideoPlayerType(customerOptions?.videoPlayerType),
     ...baseData,
     customerData: {
-      ...(isValidCustomerData ? { providedData: customerData } : {}),
+      ...(isValidProvidedData ? { providedData } : {}),
       ...(customerVideoData ? { videoData: customerVideoData } : {}),
     },
   });
