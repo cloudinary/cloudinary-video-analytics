@@ -7,9 +7,9 @@ import { sendBeaconRequest } from './utils/send-beacon-request';
 import { getVideoSource } from './utils/video-source';
 import { createViewStartEvent } from './utils/base-events';
 
-const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/video-analytics';
+const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/v1/video-analytics';
 const CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL = 'http://localhost:3001/events';
-const CLD_ANALYTICS_ENDPOINT_URL = process.env.NODE_ENV === 'development' ? CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL : CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL;
+const CLD_ANALYTICS_ENDPOINT_URL = process.env.NODE_ENV === 'development1' ? CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL : CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL;
 
 export const connectCloudinaryAnalytics = (videoElement) => {
   let videoTrackingSession = null;
