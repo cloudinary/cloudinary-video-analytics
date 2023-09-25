@@ -11,8 +11,10 @@ export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
   return createEvent(VIEW_EVENT.START, {
     videoUrl: sourceUrl,
     analyticsModuleVersion: ANALYTICS_VERSION,
-    videoPlayer: getVideoPlayerType(customerOptions?.videoPlayer),
-    videoPlayerVersion: getVideoPlayerVersion(customerOptions?.videoPlayerVersion),
+    videoPlayer: {
+      type: getVideoPlayerType(customerOptions?.videoPlayerType),
+      version: getVideoPlayerVersion(customerOptions?.videoPlayerVersion),
+    },
     ...baseData,
     customerData: {
       ...(isValidProvidedData ? { providedData } : {}),
