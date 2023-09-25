@@ -1,6 +1,6 @@
 import { isProvidedDataValid, parseProvidedData, parseCustomerVideoData, useCustomerVideoDataFallback } from './customer-data';
 import { createEvent } from './create-event';
-import { getVideoPlayerType } from './get-video-player-type';
+import { getVideoPlayerType, getVideoPlayerVersion } from './video-player-options';
 import { VIEW_EVENT } from '../events.consts';
 
 export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
@@ -11,7 +11,8 @@ export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
   return createEvent(VIEW_EVENT.START, {
     videoUrl: sourceUrl,
     analyticsModuleVersion: ANALYTICS_VERSION,
-    videoPlayerType: getVideoPlayerType(customerOptions?.videoPlayerType),
+    videoPlayer: getVideoPlayerType(customerOptions?.videoPlayer),
+    videoPlayerVersion: getVideoPlayerVersion(customerOptions?.videoPlayerVersion),
     ...baseData,
     customerData: {
       ...(isValidProvidedData ? { providedData } : {}),
