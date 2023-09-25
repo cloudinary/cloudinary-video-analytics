@@ -2,12 +2,12 @@ import { metadataValidator } from './utils/metadata-validator';
 import { initEventsCollector } from './events-collector';
 import { getVideoViewId } from './utils/video-view-id';
 import { getUserId } from './utils/user-id';
-import { setupManualDataCollector } from './data-collectors/manual-data-collector';
-import { setupAutomaticDataCollector } from './data-collectors/automatic-data-collector';
+import { setupDefaultDataCollector } from './default-data-collector';
 import { sendBeaconRequest } from './utils/send-beacon-request';
 import { getVideoSource } from './utils/video-source';
+import { createViewStartEvent } from './utils/base-events';
 
-const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/video-analytics';
+const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/v1/video-analytics';
 const CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL = 'http://localhost:3001/events';
 const CLD_ANALYTICS_ENDPOINT_URL = process.env.NODE_ENV === 'development' ? CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL : CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL;
 
@@ -15,66 +15,76 @@ export const connectCloudinaryAnalytics = (videoElement) => {
   let videoTrackingSession = null;
   const createEventsCollector = initEventsCollector(videoElement);
   const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT_URL, data);
-  const startManualTracking = (metadata) => {
+  const clearVideoTracking = () => {
+    if (videoTrackingSession) {
+      videoTrackingSession.clear();
+      videoTrackingSession = null;
+    }
+  };
+  const startManualTracking = (metadata, options = {}) => {
     // validate if user provided all necessary metadata (cloud name, public id)
     const metadataValidationResult = metadataValidator(metadata);
     if (!metadataValidationResult.isValid) {
       throw `Cloudinary video analytics tracking called without necessary data (${metadataValidationResult.errorMessage})`;
     }
 
-    stopManualTracking();
+    if (options && typeof options !== 'object') {
+      throw `Options property must be an object`;
+    }
+
+    clearVideoTracking();
 
     // start new tracking
     const viewId = getVideoViewId();
-    const videoWatchSessionEventCollector = createEventsCollector(viewId);
-    const dataCollectorRemoval = setupManualDataCollector({
-      ...metadata,
-      videoUrl: getVideoSource(videoElement),
+    const sourceUrl = getVideoSource(videoElement);
+    const viewStartEvent = createViewStartEvent(sourceUrl, {
+      trackingType: 'manual',
+    }, options);
+    const videoViewEventCollector = createEventsCollector(viewId, viewStartEvent);
+    const dataCollectorRemoval = setupDefaultDataCollector({
       userId: getUserId(),
       viewId,
-    }, videoWatchSessionEventCollector.flushEvents, sendData);
+    }, videoViewEventCollector.flushEvents, sendData);
 
     videoTrackingSession = {
       viewId,
       clear: () => {
-        videoWatchSessionEventCollector.destroy();
+        videoViewEventCollector.destroy();
         dataCollectorRemoval();
       },
     };
   };
 
-  const stopManualTracking = () => {
-    // clear previous tracking
-    if (videoTrackingSession) {
-      videoTrackingSession.clear();
-      videoTrackingSession = null;
-    }
-  };
-
-  const startAutoTracking = () => {
+  const startAutoTracking = (options = {}) => {
     if (videoTrackingSession) {
       throw `Cloudinary video analytics tracking is already connected with this HTML Video Element`;
     }
 
+    if (options && typeof options !== 'object') {
+      throw `Options property must be an object`;
+    }
+
     const onNewVideoSource = () => {
-      const sourceUrl = videoElement.src;
+      const sourceUrl = getVideoSource(videoElement);
       if (sourceUrl === window.location.href || !sourceUrl) {
         return null;
       }
 
       // start new tracking
       const viewId = getVideoViewId();
-      const videoWatchSessionEventCollector = createEventsCollector(viewId);
-      const dataCollectorRemoval = setupAutomaticDataCollector({
-        videoUrl: getVideoSource(videoElement),
+      const viewStartEvent = createViewStartEvent(sourceUrl, {
+        trackingType: 'auto',
+      }, options);
+      const videoViewEventCollector = createEventsCollector(viewId, viewStartEvent);
+      const dataCollectorRemoval = setupDefaultDataCollector({
         userId: getUserId(),
         viewId,
-      }, videoWatchSessionEventCollector.flushEvents, sendData);
+      }, videoViewEventCollector.flushEvents, sendData);
 
       videoTrackingSession = {
         viewId,
         clear: () => {
-          videoWatchSessionEventCollector.destroy();
+          videoViewEventCollector.destroy();
           dataCollectorRemoval();
         },
       };
@@ -86,12 +96,7 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       }
     });
     videoElement.addEventListener('emptied', () => {
-      if (!videoTrackingSession) {
-        return null;
-      }
-
-      videoTrackingSession.clear();
-      videoTrackingSession = null;
+      clearVideoTracking();
     });
 
     // start tracking for initial video
@@ -100,7 +105,7 @@ export const connectCloudinaryAnalytics = (videoElement) => {
 
   return {
     startManualTracking,
-    stopManualTracking,
+    stopManualTracking: clearVideoTracking,
     startAutoTracking,
   };
 };

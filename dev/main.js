@@ -1,4 +1,4 @@
-import connectCloudinaryAnalytics from 'cloudinary-video-analytics';
+import { connectCloudinaryAnalytics } from 'cloudinary-video-analytics';
 window.connectCloudinaryAnalytics = connectCloudinaryAnalytics;
 
 const videos = [
@@ -14,7 +14,7 @@ window.addEventListener('load', () => {
     let currentSelectedRadioValue = '0';
     const onMainVideoChange = (newVideoPublicId) => {
       manualVideoElement.src = newVideoPublicId;
-      manualCloudinaryAnalytics.startManuallyNewVideoTracking({
+      manualCloudinaryAnalytics.startManualTracking({
         cloudName: 'demo',
         publicId: newVideoPublicId,
       });
@@ -30,7 +30,7 @@ window.addEventListener('load', () => {
 
   // init
   connectVideoPanel();
-  manualCloudinaryAnalytics.startManuallyNewVideoTracking({
+  manualCloudinaryAnalytics.startManualTracking({
     cloudName: 'demo',
     publicId: videos[0],
   });
@@ -38,14 +38,14 @@ window.addEventListener('load', () => {
   // connect extra videos
   const extraVideo1Element = document.querySelector('#extra-video-1');
   const extraVideo1CldAnalytics = connectCloudinaryAnalytics(extraVideo1Element);
-  extraVideo1CldAnalytics.startManuallyNewVideoTracking({
+  extraVideo1CldAnalytics.startManualTracking({
     cloudName: 'demo',
     publicId: videos[0],
   });
 
   const extraVideo2Element = document.querySelector('#extra-video-2');
   const extraVideo2CldAnalytics = connectCloudinaryAnalytics(extraVideo2Element);
-  extraVideo2CldAnalytics.startManuallyNewVideoTracking({
+  extraVideo2CldAnalytics.startManualTracking({
     cloudName: 'demo',
     publicId: videos[1],
   });
@@ -68,5 +68,22 @@ window.addEventListener('load', () => {
   };
 
   connectAutoVideoPanel();
-  autoCloudinaryAnalytics.autoTracking();
+  autoCloudinaryAnalytics.startAutoTracking({
+    providedData: {
+      example: 1,
+      thisPackageIsAwesome: true,
+      test: 'test',
+      thisShouldBeSkipped: {
+        value: 1,
+      },
+    },
+    customVideoUrlFallback: (videoUrl) => {
+      if (videoUrl === 'https://res.cloudinary.com/demo/video/upload/v1692105601/dog_demo.mp4') {
+        return {
+          cloudName: 'fallback-cloud-name',
+          publicId: 'fallback-public-id',
+        };
+      }
+    },
+  });
 });
