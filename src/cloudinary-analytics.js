@@ -32,6 +32,7 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       throw `Options property must be an object`;
     }
 
+    options.customVideoUrlFallback = () => metadata;
     clearVideoTracking();
 
     // start new tracking
