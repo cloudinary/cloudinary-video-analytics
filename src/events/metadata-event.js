@@ -9,8 +9,10 @@ export const registerMetadataEvent = (videoElement, reportEvent) => {
     });
   };
   videoElement.addEventListener('loadedmetadata', eventListener);
+  videoElement.addEventListener('loadedmetadata_after_init', eventListener);
 
   return () => {
     videoElement.removeEventListener('loadedmetadata', eventListener);
+    videoElement.removeEventListener('loadedmetadata_after_init', eventListener);
   };
 };
