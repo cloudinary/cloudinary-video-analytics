@@ -5,3 +5,10 @@ export const getVideoMetadata = (videoElement) => {
     videoDuration: Number.POSITIVE_INFINITY === videoDuration ? 'Infinity' : videoDuration,
   };
 };
+
+export const tryInitEvents = (videoElement) => {
+  if (videoElement.readyState > 0) {
+    const event = new CustomEvent('loadedmetadata_after_init');
+    videoElement.dispatchEvent(event);
+  }
+};

@@ -1,3 +1,3 @@
 export const getVideoSource = (videoElement) => {
-  return videoElement.src;
+  return videoElement.currentSrc;
 };
