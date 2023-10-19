@@ -10,7 +10,9 @@ export const setupDefaultDataCollector = (data, flushEvents, sendData) => {
     });
   };
 
-  window.addEventListener('beforeunload', sendVideoData);
+  window.addEventListener('beforeunload', sendVideoData, {
+    once: true,
+  });
 
   return () => {
     window.removeEventListener('beforeunload', sendVideoData);
