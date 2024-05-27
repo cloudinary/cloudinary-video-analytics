@@ -1,3 +1,4 @@
+import { isMobile } from 'is-mobile';
 import { metadataValidator } from './utils/metadata-validator';
 import { initEventsCollector } from './events-collector';
 import { getVideoViewId } from './utils/video-view-id';
@@ -6,7 +7,6 @@ import { setupDefaultDataCollector } from './default-data-collector';
 import { sendBeaconRequest } from './utils/send-beacon-request';
 import { getVideoSource } from './utils/video-source';
 import { createViewStartEvent } from './utils/base-events';
-import { isMobileDevice } from './utils/is-mobile';
 
 const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/v1/video-analytics';
 const CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL = 'http://localhost:3001/events';
@@ -14,7 +14,7 @@ const CLD_ANALYTICS_ENDPOINT_URL = process.env.NODE_ENV === 'development' ? CLD_
 
 export const connectCloudinaryAnalytics = (videoElement) => {
   let videoTrackingSession = null;
-  const isMobile = isMobileDevice();
+  const isMobileDetected = isMobile({ tablet: true, featureDetect: true });
   const createEventsCollector = initEventsCollector(videoElement);
   const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT_URL, data);
   const clearVideoTracking = () => {
@@ -47,7 +47,7 @@ export const connectCloudinaryAnalytics = (videoElement) => {
     const dataCollectorRemoval = setupDefaultDataCollector({
       userId: getUserId(),
       viewId,
-    }, videoViewEventCollector.flushEvents, sendData, isMobile);
+    }, videoViewEventCollector.flushEvents, sendData, isMobileDetected);
 
     videoTrackingSession = {
       viewId,
@@ -82,7 +82,7 @@ export const connectCloudinaryAnalytics = (videoElement) => {
       const dataCollectorRemoval = setupDefaultDataCollector({
         userId: getUserId(),
         viewId,
-      }, videoViewEventCollector.flushEvents, sendData, isMobile);
+      }, videoViewEventCollector.flushEvents, sendData, isMobileDetected);
 
       videoTrackingSession = {
         viewId,

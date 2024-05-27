@@ -12,6 +12,7 @@
   "author": "Cloudinary",
   "license": "MIT",
   "dependencies": {
+    "is-mobile": "^4.0.0",
     "uuid": "9.0.0"
   },
   "devDependencies": {
