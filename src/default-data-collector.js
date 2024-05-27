@@ -15,12 +15,12 @@ export const setupDefaultDataCollector = (data, flushEvents, sendData, isMobile)
     }
   };
 
-  window.addEventListener('beforeunload', sendVideoData, {
-    once: true,
-  });
-
   if (isMobile) {
     document.addEventListener('visibilitychange', onMobileVisibilityChange);
+  } else {
+    window.addEventListener('beforeunload', sendVideoData, {
+      once: true,
+    });
   }
 
   return () => {
