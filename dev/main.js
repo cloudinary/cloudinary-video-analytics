@@ -2,9 +2,18 @@ import { connectCloudinaryAnalytics } from 'cloudinary-video-analytics';
 window.connectCloudinaryAnalytics = connectCloudinaryAnalytics;
 
 const videos = [
-  'https://res.cloudinary.com/demo/video/upload/v1651840278/samples/cld-sample-video.mp4',
-  'https://res.cloudinary.com/demo/video/upload/v1643890261/cld-sample-video.mp4',
-  'https://res.cloudinary.com/demo/video/upload/v1692105601/dog_demo.mp4',
+  {
+    url: 'https://res.cloudinary.com/demo/video/upload/v1651840278/samples/cld-sample-video.mp4',
+    publicId: 'samples/cld-sample-video',
+  },
+  {
+    url: 'https://res.cloudinary.com/demo/video/upload/v1643890261/cld-sample-video.mp4',
+    publicId: 'cld-sample-video',
+  },
+  {
+    url: 'https://res.cloudinary.com/demo/video/upload/v1692105601/dog_demo.mp4',
+    publicId: 'dog_demo',
+  },
 ];
 
 window.addEventListener('load', () => {
@@ -23,7 +32,7 @@ window.addEventListener('load', () => {
     document.addEventListener('input', (e) => {
       if (e.target.getAttribute('name') === 'videoType') {
         currentSelectedRadioValue = e.target.value;
-        onMainVideoChange(videos[currentSelectedRadioValue]);
+        onMainVideoChange(videos[currentSelectedRadioValue].url);
       }
     });
   };
@@ -32,7 +41,7 @@ window.addEventListener('load', () => {
   connectVideoPanel();
   manualCloudinaryAnalytics.startManualTracking({
     cloudName: 'demo',
-    publicId: videos[0],
+    publicId: videos[0].publicId,
   });
 
   // connect extra videos
@@ -40,14 +49,14 @@ window.addEventListener('load', () => {
   const extraVideo1CldAnalytics = connectCloudinaryAnalytics(extraVideo1Element);
   extraVideo1CldAnalytics.startManualTracking({
     cloudName: 'demo',
-    publicId: videos[0],
+    publicId: videos[0].publicId,
   });
 
   const extraVideo2Element = document.querySelector('#extra-video-2');
   const extraVideo2CldAnalytics = connectCloudinaryAnalytics(extraVideo2Element);
   extraVideo2CldAnalytics.startManualTracking({
     cloudName: 'demo',
-    publicId: videos[1],
+    publicId: videos[1].publicId,
   });
 
   // auto detection
@@ -62,7 +71,7 @@ window.addEventListener('load', () => {
     document.addEventListener('input', (e) => {
       if (e.target.getAttribute('name') === 'autoVideoType') {
         currentSelectedRadioValue = e.target.value;
-        onMainVideoChange(videos[currentSelectedRadioValue] || '');
+        onMainVideoChange(videos[currentSelectedRadioValue].url || '');
       }
     });
   };
