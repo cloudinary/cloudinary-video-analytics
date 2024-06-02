@@ -15,9 +15,7 @@ export const setupDefaultDataCollector = (data, flushEvents, sendData, isMobile)
     }
   };
 
-  window.addEventListener('beforeunload', sendVideoData, {
-    once: true,
-  });
+  const onBeforeUnload = () => sendVideoData();
 
   const onMobileVisibilityChange = () => {
     if (document.visibilityState === 'hidden') {
@@ -26,14 +24,18 @@ export const setupDefaultDataCollector = (data, flushEvents, sendData, isMobile)
   };
   const onMobilePageHide = () => sendVideoData();
 
+  window.addEventListener('beforeunload', onBeforeUnload, {
+    once: true,
+  });
+
   if (isMobile) {
-    document.addEventListener('visibilitychange', onMobileVisibilityChange);
     window.addEventListener('pagehide', onMobilePageHide);
+    document.addEventListener('visibilitychange', onMobileVisibilityChange);
   }
 
   return () => {
-    window.removeEventListener('beforeunload', sendVideoData);
-    window.addEventListener('pagehide', onMobilePageHide);
+    window.removeEventListener('beforeunload', onBeforeUnload);
+    window.removeEventListener('pagehide', onMobilePageHide);
     document.removeEventListener('visibilitychange', onMobileVisibilityChange);
     sendVideoData();
   };
