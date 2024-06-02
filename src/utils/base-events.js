@@ -9,7 +9,6 @@ export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
   const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(sourceUrl, customerOptions.customVideoUrlFallback) : null;
   const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
   return createEvent(VIEW_EVENT.START, {
-    videoUrl: sourceUrl,
     analyticsModuleVersion: ANALYTICS_VERSION,
     videoPlayer: {
       type: getVideoPlayerType(customerOptions?.videoPlayerType),
@@ -23,6 +22,8 @@ export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
   });
 };
 
-export const createViewEndEvent = () => {
-  return createEvent(VIEW_EVENT.END, {});
+export const createViewEndEvent = (sourceUrl) => {
+  return createEvent(VIEW_EVENT.END, {
+    videoUrl: sourceUrl,
+  });
 };
