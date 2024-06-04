@@ -1,10 +1,10 @@
-import { registerPlayEvent } from './events/play-event';
-import { registerPauseEvent } from './events/pause-event';
-import { registerMetadataEvent } from './events/metadata-event';
+import { registerNativePlayEvent, registerCustomPlayEvent } from './events/play-event';
+import { registerNativePauseEvent, registerCustomPauseEvent } from './events/pause-event';
+import { registerNativeMetadataEvent, registerCustomMetadataEvent } from './events/metadata-event';
 import { createEvent } from './utils/create-event';
 import { tryInitEvents } from './utils/video-metadata';
 
-export const initEventsCollector = (videoElement) => {
+export const initEventsCollector = (videoElement, shouldUseCustomEvents) => {
   const collectedEvents = {};
   const rawEvents = {};
 
@@ -16,12 +16,16 @@ export const initEventsCollector = (videoElement) => {
     const videoViewRawEvents = rawEvents[viewId];
 
     const reportEvent = (eventName, eventDetails) => videoViewRawEvents.push(createEvent(eventName, eventDetails));
-    const registeredEvents = [
-      registerPlayEvent(videoElement, reportEvent),
-      registerPauseEvent(videoElement, reportEvent),
-      registerMetadataEvent(videoElement, reportEvent),
+    const registeredEvents = shouldUseCustomEvents ? [
+      registerCustomPlayEvent(videoElement, reportEvent),
+      registerCustomPauseEvent(videoElement, reportEvent),
+      registerCustomMetadataEvent(videoElement, reportEvent),
+    ] : [
+      registerNativePlayEvent(videoElement, reportEvent),
+      registerNativePauseEvent(videoElement, reportEvent),
+      registerNativeMetadataEvent(videoElement, reportEvent),
     ];
-    tryInitEvents(videoElement);
+    tryInitEvents(videoElement, shouldUseCustomEvents);
     const flushEvents = () => {
       const events = videoViewRawEvents.splice(0, videoViewRawEvents.length);
       videoViewCollectedEvents.splice(videoViewCollectedEvents.length, 0, ...events);

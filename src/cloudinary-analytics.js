@@ -7,15 +7,21 @@ import { setupDefaultDataCollector } from './default-data-collector';
 import { sendBeaconRequest } from './utils/send-beacon-request';
 import { getVideoSource } from './utils/video-source';
 import { createViewStartEvent } from './utils/base-events';
+import { VIDEO_CUSTOM_EVENT_PREFIX } from './events.consts';
 
 const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/v1/video-analytics';
 const CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL = 'http://localhost:3001/events';
 const CLD_ANALYTICS_ENDPOINT_URL = process.env.NODE_ENV === 'development' ? CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL : CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL;
 
-export const connectCloudinaryAnalytics = (videoElement) => {
+export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
+  if (mainOptions && typeof mainOptions !== 'object') {
+    throw `Options property must be an object`;
+  }
+
   let videoTrackingSession = null;
+  const shouldUseCustomEvents = mainOptions.customEvents === true;
   const isMobileDetected = isMobile({ tablet: true, featureDetect: true });
-  const createEventsCollector = initEventsCollector(videoElement);
+  const createEventsCollector = initEventsCollector(videoElement, shouldUseCustomEvents);
   const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT_URL, data);
   const clearVideoTracking = () => {
     if (videoTrackingSession) {
@@ -92,13 +98,15 @@ export const connectCloudinaryAnalytics = (videoElement) => {
         },
       };
     };
+    const loadStartEventName = shouldUseCustomEvents ? `${VIDEO_CUSTOM_EVENT_PREFIX}loadstart` : 'loadstart';
+    const emptiedEventName = shouldUseCustomEvents ? `${VIDEO_CUSTOM_EVENT_PREFIX}emptied` : 'emptied';
 
-    videoElement.addEventListener('loadstart', () => {
+    videoElement.addEventListener(loadStartEventName, () => {
       if (!videoTrackingSession) {
         onNewVideoSource();
       }
     });
-    videoElement.addEventListener('emptied', () => {
+    videoElement.addEventListener(emptiedEventName, () => {
       clearVideoTracking();
     });
 
