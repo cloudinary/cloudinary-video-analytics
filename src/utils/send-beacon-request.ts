@@ -1,4 +1,4 @@
-export const sendBeaconRequest = (url, data) => {
+export const sendBeaconRequest = <T = Record<string, any>>(url: string, data: T) => {
   const params = Object.keys(data).reduce((formData, key) => {
     formData.append(key, data[key]);
     return formData;

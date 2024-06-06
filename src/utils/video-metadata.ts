@@ -1,4 +1,6 @@
-export const getVideoMetadata = (videoElement) => {
+import { VideoDurationValue } from '../types/main';
+
+export const getVideoMetadata = (videoElement: HTMLVideoElement): { videoDuration: VideoDurationValue } => {
   const videoElementDuration = videoElement.duration;
   const videoDuration = Number.isNaN(videoElementDuration) ? null : videoElementDuration;
   return {
@@ -6,7 +8,7 @@ export const getVideoMetadata = (videoElement) => {
   };
 };
 
-export const tryInitEvents = (videoElement) => {
+export const tryInitEvents = (videoElement: HTMLVideoElement) => {
   if (videoElement.readyState > 0) {
     const event = new CustomEvent('loadedmetadata_after_init');
     videoElement.dispatchEvent(event);

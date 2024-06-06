@@ -1,15 +1,16 @@
 const REGEX_SEMANTIC_VERSION = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/;
 const NATIVE_VIDEO_PLAYER = 'native';
-const ALLOWED_VIDEO_PLAYER_TYPES = [NATIVE_VIDEO_PLAYER, 'cloudinary video player'];
+export const ALLOWED_VIDEO_PLAYER_TYPES = [NATIVE_VIDEO_PLAYER, 'cloudinary video player'] as const;
 
-export const getVideoPlayerType = (videoPlayerType) => {
+export const getVideoPlayerType = (videoPlayerType: typeof ALLOWED_VIDEO_PLAYER_TYPES[number]) => {
   if (ALLOWED_VIDEO_PLAYER_TYPES.includes(videoPlayerType)) {
     return videoPlayerType;
   }
+
   return NATIVE_VIDEO_PLAYER;
 };
 
-export const getVideoPlayerVersion = (videoPlayerVersion) => {
+export const getVideoPlayerVersion = (videoPlayerVersion: string) => {
   if (typeof videoPlayerVersion === 'string' && REGEX_SEMANTIC_VERSION.test(videoPlayerVersion)) {
     return videoPlayerVersion;
   }

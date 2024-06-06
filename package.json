@@ -7,7 +7,7 @@
     "build": "NODE_ENV=production webpack",
     "start": "webpack serve --config webpack.dev.config.js ",
     "start-server": "node ./dev/http-server.js",
-    "dev": "concurrently --kill-others \"yarn start-server\" \"yarn start\""
+    "dev": "concurrently --kill-others \"npm start-server\" \"npm start\""
   },
   "author": "Cloudinary",
   "license": "MIT",
@@ -18,11 +18,13 @@
   "devDependencies": {
     "@babel/core": "7.22.5",
     "@babel/preset-env": "7.22.5",
+    "@types/uuid": "9.0.8",
     "babel-loader": "9.1.2",
     "concurrently": "8.2.0",
     "html-webpack-plugin": "5.5.0",
     "http": "0.0.1-security",
     "multiparty": "4.2.3",
+    "ts-loader": "^9.5.1",
     "webpack": "5.88.2",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "4.15.1",
