@@ -1,7 +1,9 @@
+import { CustomerVideoData, CustomerVideoDataFallback, CustomerProvidedData } from '../types/main';
+
 const ALLOWED_DATA_TYPES = ['string', 'number', 'boolean'];
 const CUSTOMER_DATA_CHARS_LIMIT = 1000;
 
-export const parseProvidedData = (data) => {
+export const parseProvidedData = (data: CustomerProvidedData) => {
   if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
     const parsedData = Object.keys(data).reduce((collection, dataKey) => {
       if (ALLOWED_DATA_TYPES.includes(typeof data[dataKey]) || data[dataKey] === null) {
@@ -17,7 +19,7 @@ export const parseProvidedData = (data) => {
   return null;
 };
 
-export const isProvidedDataValid = (providedData) => {
+export const isProvidedDataValid = (providedData: CustomerProvidedData) => {
   if (providedData === null) {
     return false;
   }
@@ -26,7 +28,7 @@ export const isProvidedDataValid = (providedData) => {
   return stringifiedValue.length <= CUSTOMER_DATA_CHARS_LIMIT;
 };
 
-export const useCustomerVideoDataFallback = (videoUrl, fallback) => {
+export const useCustomerVideoDataFallback = (videoUrl: string, fallback: CustomerVideoDataFallback) => {
   try {
     const result = fallback(videoUrl);
     return {
@@ -38,7 +40,7 @@ export const useCustomerVideoDataFallback = (videoUrl, fallback) => {
   }
 };
 
-export const parseCustomerVideoData = (data) => {
+export const parseCustomerVideoData = (data: CustomerVideoData) => {
   if (
     data !== null &&
     typeof data === 'object' &&

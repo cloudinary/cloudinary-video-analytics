@@ -10,7 +10,7 @@ module.exports = {
       new TerserPlugin()
     ]
   },
-  entry: './src/index.js',
+  entry: './src/index.ts',
   output: {
     clean: true,
     filename: `[name].js`,
@@ -22,11 +22,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: [{
-          loader: 'babel-loader'
-        }]
+        test: /\.([cm]?ts|tsx)$/,
+        loader: 'ts-loader'
       }
     ]
   },

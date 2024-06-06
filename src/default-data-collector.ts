@@ -1,6 +1,6 @@
 import { prepareEvents } from './utils/prepare-events';
 
-export const setupDefaultDataCollector = (data, flushEvents, sendData, isMobile) => {
+export const setupDefaultDataCollector = (data, flushEvents, sendData, isMobile: boolean) => {
   const sendVideoData = () => {
     const collectedEvents = flushEvents();
 

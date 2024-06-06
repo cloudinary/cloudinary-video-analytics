@@ -1,6 +1,8 @@
-import { VIDEO_EVENT } from '../events.consts';
+import { VIDEO_EVENT } from '../constants';
+import { ReportEvent } from '../events-collector';
+import { EventPauseData } from '../types/events';
 
-export const registerPauseEvent = (videoElement, reportEvent) => {
+export const registerNativePauseEvent = (videoElement: HTMLVideoElement, reportEvent: ReportEvent<EventPauseData>) => {
   const pauseEventListener = () => {
     reportEvent(VIDEO_EVENT.PAUSE, {});
   };
@@ -11,7 +13,7 @@ export const registerPauseEvent = (videoElement, reportEvent) => {
   videoElement.addEventListener('emptied', emptiedEventListener);
 
   return () => {
-    videoElement.removeEventListener('play', pauseEventListener);
+    videoElement.removeEventListener('pause', pauseEventListener);
     videoElement.removeEventListener('emptied', emptiedEventListener);
   };
 };

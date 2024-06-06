@@ -1,4 +1,4 @@
-name: Publish new version of package 🚀
+name: Publish new version of package
 
 on:
   workflow_dispatch:
@@ -33,18 +33,15 @@ jobs:
           git config user.name "cloudinary-bot"
           git config user.email "cloudinary-bot@clodinary.com"
 
-      - name: Setup yarn
-        run: npm install -g yarn
-
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Bump version
         run: npm version ${{ github.event.inputs.version-type }} -m "Bumping to version %s" --tag-version-prefix=""
 
       - name: Build
         shell: bash
-        run: yarn build
+        run: npm run build
 
       - name: Publish packages
         run: npm publish --access="public"

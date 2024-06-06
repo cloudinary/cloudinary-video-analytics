@@ -1,4 +1,6 @@
-export const metadataValidator = (metadata) => {
+import { CustomerVideoData } from '../types/main';
+
+export const metadataValidator = (metadata: CustomerVideoData) => {
   if (typeof metadata !== 'object') {
     return {
       isValid: false,

@@ -1,21 +1,27 @@
 import { isProvidedDataValid, parseProvidedData, parseCustomerVideoData, useCustomerVideoDataFallback } from './customer-data';
 import { createEvent } from './create-event';
 import { getVideoPlayerType, getVideoPlayerVersion } from './video-player-options';
-import { VIEW_EVENT } from '../events.consts';
+import { VIEW_EVENT } from '../constants';
+import { CustomerOptions } from '../types/main';
+import { EventViewEndData, EventViewStartData } from '../types/events';
 
-export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
-  const providedData = parseProvidedData(customerOptions?.providedData);
+export interface ViewStartEventBaseData {
+  videoUrl: string;
+  trackingType: 'manual' | 'auto';
+}
+
+export const createViewStartEvent = (baseData: ViewStartEventBaseData, customerOptions: CustomerOptions) => {
+  const providedData = parseProvidedData(customerOptions.providedData);
   const isValidProvidedData = isProvidedDataValid(providedData);
-  const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(sourceUrl, customerOptions.customVideoUrlFallback) : null;
+  const customerVideoDataFromFallback = customerOptions.customVideoUrlFallback ? useCustomerVideoDataFallback(baseData.videoUrl, customerOptions.customVideoUrlFallback) : null;
   const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
-  return createEvent(VIEW_EVENT.START, {
-    videoUrl: sourceUrl,
+  return createEvent<typeof VIEW_EVENT.START, EventViewStartData>(VIEW_EVENT.START, {
+    ...baseData,
     analyticsModuleVersion: ANALYTICS_VERSION,
     videoPlayer: {
       type: getVideoPlayerType(customerOptions?.videoPlayerType),
       version: getVideoPlayerVersion(customerOptions?.videoPlayerVersion),
     },
-    ...baseData,
     customerData: {
       ...(isValidProvidedData ? { providedData } : {}),
       ...(customerVideoData ? { videoData: customerVideoData } : {}),
@@ -24,5 +30,5 @@ export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
 };
 
 export const createViewEndEvent = () => {
-  return createEvent(VIEW_EVENT.END, {});
+  return createEvent<typeof VIEW_EVENT.END, EventViewEndData>(VIEW_EVENT.END, {});
 };
