@@ -1,6 +1,6 @@
-import { VIDEO_EVENT } from '../events.consts';
+import { VIDEO_EVENT, VIDEO_CUSTOM_EVENT_PREFIX } from '../events.consts';
 
-export const registerPlayEvent = (videoElement, reportEvent) => {
+export const registerNativePlayEvent = (videoElement, reportEvent) => {
   const eventListener = () => {
     reportEvent(VIDEO_EVENT.PLAY, {});
   };
@@ -8,5 +8,16 @@ export const registerPlayEvent = (videoElement, reportEvent) => {
 
   return () => {
     videoElement.removeEventListener('play', eventListener);
+  };
+};
+
+export const registerCustomPlayEvent = (videoElement, reportEvent) => {
+  const eventListener = () => {
+    reportEvent(VIDEO_EVENT.PLAY, {});
+  };
+  videoElement.addEventListener(`${VIDEO_CUSTOM_EVENT_PREFIX}play`, eventListener);
+
+  return () => {
+    videoElement.removeEventListener(`${VIDEO_CUSTOM_EVENT_PREFIX}play`, eventListener);
   };
 };
