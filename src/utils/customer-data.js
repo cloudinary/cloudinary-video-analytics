@@ -1,17 +1,25 @@
-const ALLOWED_DATA_TYPES = ['string', 'number', 'boolean'];
 const CUSTOMER_DATA_CHARS_LIMIT = 1000;
+
+const filterProvidedData = (data) => {
+  return Array(5).reduce((obj, cv, currentIndex) => {
+    const key = `customData${currentIndex + 1}`;
+
+    if (typeof data[key] === 'string') {
+      obj[key] = data[key];
+    }
+
+    return obj;
+  }, {})
+};
 
 export const parseProvidedData = (data) => {
   if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
-    const parsedData = Object.keys(data).reduce((collection, dataKey) => {
-      if (ALLOWED_DATA_TYPES.includes(typeof data[dataKey]) || data[dataKey] === null) {
-        collection[dataKey] = data[dataKey];
-      }
-
-      return collection;
-    }, {});
-
-    return Object.keys(parsedData).length > 0 ? parsedData : null;
+    const filteredData = filterProvidedData(data);
+    return Object.keys(filteredData).length > 0 ? filteredData : null;
+  } else if (typeof data === 'function') {
+    const dataFnResult = data();
+    const filteredData = filterProvidedData(dataFnResult);
+    return Object.keys(filteredData).length > 0 ? filteredData : null;
   }
 
   return null;
