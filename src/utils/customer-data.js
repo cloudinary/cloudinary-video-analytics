@@ -1,7 +1,7 @@
 const CUSTOMER_DATA_CHARS_LIMIT = 1000;
 
-const filterProvidedData = (data) => {
-  return Array(5).reduce((obj, cv, currentIndex) => {
+const filterOutNonStrings = (data) => {
+  return Array.from({ length: 5 }).reduce((obj, cv, currentIndex) => {
     const key = `customData${currentIndex + 1}`;
 
     if (typeof data[key] === 'string') {
@@ -12,18 +12,16 @@ const filterProvidedData = (data) => {
   }, {})
 };
 
-export const parseProvidedData = (data) => {
+export const parseProvidedData = (providedData) => {
+  const data = typeof providedData === 'function' ? providedData() : providedData;
+
   if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
-    const filteredData = filterProvidedData(data);
-    return Object.keys(filteredData).length > 0 ? filteredData : null;
-  } else if (typeof data === 'function') {
-    const dataFnResult = data();
-    const filteredData = filterProvidedData(dataFnResult);
+    const filteredData = filterOutNonStrings(data);
     return Object.keys(filteredData).length > 0 ? filteredData : null;
   }
 
   return null;
-};
+}
 
 export const isProvidedDataValid = (providedData) => {
   if (providedData === null) {
