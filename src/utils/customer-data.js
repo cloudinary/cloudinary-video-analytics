@@ -1,21 +1,27 @@
-const ALLOWED_DATA_TYPES = ['string', 'number', 'boolean'];
 const CUSTOMER_DATA_CHARS_LIMIT = 1000;
 
-export const parseProvidedData = (data) => {
+const filterOutNonStrings = (data) => {
+  return Array.from({ length: 5 }).reduce((obj, cv, currentIndex) => {
+    const key = `customData${currentIndex + 1}`;
+
+    if (typeof data[key] === 'string') {
+      obj[key] = data[key];
+    }
+
+    return obj;
+  }, {})
+};
+
+export const parseProvidedData = (providedData) => {
+  const data = typeof providedData === 'function' ? providedData() : providedData;
+
   if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
-    const parsedData = Object.keys(data).reduce((collection, dataKey) => {
-      if (ALLOWED_DATA_TYPES.includes(typeof data[dataKey]) || data[dataKey] === null) {
-        collection[dataKey] = data[dataKey];
-      }
-
-      return collection;
-    }, {});
-
-    return Object.keys(parsedData).length > 0 ? parsedData : null;
+    const filteredData = filterOutNonStrings(data);
+    return Object.keys(filteredData).length > 0 ? filteredData : null;
   }
 
   return null;
-};
+}
 
 export const isProvidedDataValid = (providedData) => {
   if (providedData === null) {
