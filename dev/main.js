@@ -78,7 +78,7 @@ window.addEventListener('load', () => {
 
   connectAutoVideoPanel();
   autoCloudinaryAnalytics.startAutoTracking({
-    providedData: {
+    customData: {
       customData1: 1, // skipped
       customData2: 'value',
       test: 'test', // skipped

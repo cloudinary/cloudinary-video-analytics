@@ -4,7 +4,7 @@ import { getVideoPlayerType, getVideoPlayerVersion } from './video-player-option
 import { VIEW_EVENT } from '../events.consts';
 
 export const createViewStartEvent = (sourceUrl, baseData, customerOptions) => {
-  const providedData = parseProvidedData(customerOptions?.providedData);
+  const providedData = parseProvidedData(customerOptions?.customData);
   const isValidProvidedData = isProvidedDataValid(providedData);
   const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(sourceUrl, customerOptions.customVideoUrlFallback) : null;
   const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
