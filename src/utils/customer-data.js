@@ -12,8 +12,8 @@ const filterOutNonStrings = (data) => {
   }, {})
 };
 
-export const parseProvidedData = (providedData) => {
-  const data = typeof providedData === 'function' ? providedData() : providedData;
+export const parseCustomData = (customData) => {
+  const data = typeof customData === 'function' ? customData() : customData;
 
   if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
     const filteredData = filterOutNonStrings(data);
@@ -23,12 +23,12 @@ export const parseProvidedData = (providedData) => {
   return null;
 }
 
-export const isProvidedDataValid = (providedData) => {
-  if (providedData === null) {
+export const isCustomDataValid = (customData) => {
+  if (customData === null) {
     return false;
   }
 
-  const stringifiedValue = JSON.stringify(providedData);
+  const stringifiedValue = JSON.stringify(customData);
   return stringifiedValue.length <= CUSTOMER_DATA_CHARS_LIMIT;
 };
 
