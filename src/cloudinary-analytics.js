@@ -53,7 +53,7 @@ export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
     const dataCollectorRemoval = setupDefaultDataCollector({
       userId: getUserId(),
       viewId,
-    }, videoViewEventCollector.flushEvents, sendData, isMobileDetected);
+    }, videoViewEventCollector.flushEvents, sendData, videoElement, isMobileDetected);
 
     videoTrackingSession = {
       viewId,
@@ -88,7 +88,7 @@ export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
       const dataCollectorRemoval = setupDefaultDataCollector({
         userId: getUserId(),
         viewId,
-      }, videoViewEventCollector.flushEvents, sendData, isMobileDetected);
+      }, videoViewEventCollector.flushEvents, sendData, videoElement, isMobileDetected);
 
       videoTrackingSession = {
         viewId,
