@@ -56,6 +56,7 @@ export const parseCustomerVideoData = (data) => {
     return {
       cloudName: data.cloudName,
       publicId: data.publicId,
+      ...(data.type === 'live' && { type: data.type }),
     };
   }
 

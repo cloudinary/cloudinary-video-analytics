@@ -1,41 +1,24 @@
-import { VIDEO_CUSTOM_EVENT_PREFIX, VIDEO_EVENT } from '../events.consts';
-import { getVideoMetadata } from '../utils/video-metadata';
+import { VIDEO_EVENT } from '../events.consts';
 
-export const registerNativeMetadataEvent = (videoElement, reportEvent) => {
-  const eventListener = () => {
-    const videoMetadata = getVideoMetadata(videoElement);
-    reportEvent(VIDEO_EVENT.LOADED_METADATA, {
-      videoDuration: videoMetadata.videoDuration,
-    });
-  };
-  videoElement.addEventListener('loadedmetadata', eventListener);
-  videoElement.addEventListener('loadedmetadata_after_init', eventListener);
-
-  return () => {
-    videoElement.removeEventListener('loadedmetadata', eventListener);
-    videoElement.removeEventListener('loadedmetadata_after_init', eventListener);
-  };
+export const parseVideoDuration = (durationValue) => {
+  const videoDuration = Number.isNaN(durationValue) ? null : durationValue;
+  return Number.POSITIVE_INFINITY === videoDuration ? 'Infinity' : videoDuration;
 };
 
-export const registerCustomMetadataEvent = (videoElement, reportEvent) => {
-  const loadedmetadataEventListener = (event) => {
-    const videoMetadata = getVideoMetadata(videoElement);
-    const videoDuration = event.detail.videoDuration || videoMetadata.videoDuration;
+export const registerMetadataEvent = (playerAdapter, reportEvent) => {
+  const reportLoadedMetadata = () => {
     reportEvent(VIDEO_EVENT.LOADED_METADATA, {
-      videoDuration,
+      videoDuration: parseVideoDuration(playerAdapter.getDuration()),
+      videoUrl: playerAdapter.getCurrentSrc(),
     });
   };
-  videoElement.addEventListener(`${VIDEO_CUSTOM_EVENT_PREFIX}loadedmetadata`, loadedmetadataEventListener);
+  const eventLoadedMetadataClearCallback = playerAdapter.onLoadedMetadata(() => reportLoadedMetadata());
 
-  const loadedmetadataAfterInitEventListener = (event) => {
-    reportEvent(VIDEO_EVENT.LOADED_METADATA, {
-      videoDuration: typeof event.detail.videoDuration !== 'number' && event.detail.videoDuration > 0 ? null : event.detail.videoDuration,
-    });
-  };
-  videoElement.addEventListener(`${VIDEO_CUSTOM_EVENT_PREFIX}loadedmetadata_after_init`, loadedmetadataAfterInitEventListener);
+  if (playerAdapter.getReadyState() > 0) {
+    reportLoadedMetadata();
+  }
 
   return () => {
-    videoElement.removeEventListener(`${VIDEO_CUSTOM_EVENT_PREFIX}loadedmetadata`, loadedmetadataEventListener);
-    videoElement.removeEventListener(`${VIDEO_CUSTOM_EVENT_PREFIX}loadedmetadata_after_init`, loadedmetadataAfterInitEventListener);
+    eventLoadedMetadataClearCallback();
   };
 };

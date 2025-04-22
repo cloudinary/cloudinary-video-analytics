@@ -1,15 +1,15 @@
-import { prepareEvents } from './utils/prepare-events';
+import { prepareEvents } from './utils/events';
 
-export const setupDefaultDataCollector = (data, flushEvents, sendData, isMobile) => {
+export const setupDefaultDataCollector = (viewSessionData, flushEvents, createEndEvent, sendData, isMobile) => {
   const sendVideoData = () => {
     const collectedEvents = flushEvents();
 
     // multiple events can be triggered one by one for specific browsers but we don't have guarantee which ones
     // in this case send data for first event and for rest just skip it to avoid empty payload
     if (collectedEvents.length > 0) {
-      const events = prepareEvents(collectedEvents);
+      const events = prepareEvents([...collectedEvents, createEndEvent()]);
       sendData({
-        ...data,
+        ...viewSessionData,
         events,
       });
     }
