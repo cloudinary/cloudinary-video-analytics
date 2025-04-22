@@ -33,7 +33,7 @@ export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
   const userId = getUserId();
   const { playerAdapter } = mainOptions;
   const isMobileDetected = isMobile({ tablet: true, featureDetect: true });
-  const createEventsCollector = initEventsCollector(videoElement, playerAdapter);
+  const createEventsCollector = initEventsCollector(playerAdapter);
   const clearVideoTracking = () => {
     if (videoTrackingSession) {
       videoTrackingSession.clear();
