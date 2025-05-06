@@ -26,6 +26,8 @@ export const createRegularVideoViewEndEvent = (baseData = {}) => {
 };
 
 export const createLiveStreamViewStartEvent = (baseData, customerOptions) => {
+  const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(baseData.videoUrl, customerOptions.customVideoUrlFallback) : null;
+  const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
   return createEvent(VIEW_EVENT.START, {
     ...baseData,
     analyticsModuleVersion: ANALYTICS_VERSION,
@@ -33,11 +35,21 @@ export const createLiveStreamViewStartEvent = (baseData, customerOptions) => {
       type: getVideoPlayerType(customerOptions?.videoPlayerType),
       version: getVideoPlayerVersion(customerOptions?.videoPlayerVersion),
     },
+    videoData: {
+      ...customerVideoData,
+    },
   });
 };
 
-export const createLiveStreamViewEndEvent = (baseData) => {
-  return createEvent(VIEW_EVENT.END, { ...baseData });
+export const createLiveStreamViewEndEvent = (baseData, customerOptions) => {
+  const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(baseData.videoUrl, customerOptions.customVideoUrlFallback) : null;
+  const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
+  return createEvent(VIEW_EVENT.END, {
+    ...baseData,
+    videoData: {
+      ...customerVideoData,
+    },
+  });
 };
 
 export const createEvent = (eventName, eventDetails) => ({
@@ -48,6 +60,5 @@ export const createEvent = (eventName, eventDetails) => ({
 
 export const prepareEvents = (collectedEvents) => {
   const events = [...collectedEvents];
-  events.push(createRegularVideoViewEndEvent());
   return JSON.stringify(events);
 };

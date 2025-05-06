@@ -1,11 +1,18 @@
 import { isMobile } from 'is-mobile';
-import { initEventsCollector } from './events-collector';
+import { initEventsCollector } from './data-collectors/events-collector';
 import { getVideoViewId, getUserId } from './utils/unique-ids';
-import { setupDefaultDataCollector } from './default-data-collector';
+import { setupDefaultDataCollector } from './data-collectors/default-data-collector';
 import { sendBeaconRequest } from './utils/send-beacon-request';
-import { createRegularVideoViewEndEvent, createLiveStreamViewStartEvent, createLiveStreamViewEndEvent, createRegularVideoViewStartEvent } from './utils/events';
+import {
+  createRegularVideoViewEndEvent,
+  createLiveStreamViewStartEvent,
+  createLiveStreamViewEndEvent,
+  createRegularVideoViewStartEvent,
+  prepareEvents,
+} from './utils/events';
 import { throwErrorIfInvalid, metadataValidator, mainOptionsValidator, trackingOptionsValidator } from './utils/validators';
 import { nativeHtmlVideoPlayerAdapter } from './player-adapters/nativeHtmlVideoPlayerAdapter';
+import { setupLiveDataCollector } from './data-collectors/live-data-collector';
 
 const CLD_ANALYTICS_ENDPOINTS_LIST = {
   production: {
@@ -90,17 +97,22 @@ export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
   const _startManualTrackingLiveStream = (metadata, options) => {
     const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT.liveStreams, data);
     const viewId = getVideoViewId();
-    const viewStartEvent = createLiveStreamViewStartEvent({
-      videoUrl: playerAdapter.getCurrentSrc(),
-    }, options);
-    const videoViewEventCollector = createEventsCollector(viewId, viewStartEvent);
-    const dataCollectorRemoval = setupDefaultDataCollector(
+
+    sendData({
+      userId,
+      viewId,
+      events: prepareEvents([
+        createLiveStreamViewStartEvent({
+          videoUrl: playerAdapter.getCurrentSrc(),
+        }, options),
+      ]),
+    });
+    const dataCollectorRemoval = setupLiveDataCollector(
       {
         userId,
         viewId,
       },
-      videoViewEventCollector.flushEvents,
-      () => createLiveStreamViewEndEvent(),
+      () => createLiveStreamViewEndEvent({}, options),
       sendData,
       isMobileDetected,
     );
@@ -108,7 +120,6 @@ export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
     videoTrackingSession = {
       viewId,
       clear: () => {
-        videoViewEventCollector.destroy();
         dataCollectorRemoval();
       },
     };
@@ -133,8 +144,8 @@ export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
 
       // start new tracking
       const viewId = getVideoViewId();
-      const viewStartEvent = createViewStartEvent({
-        videoUrl: sourceUrl,
+      const viewStartEvent = createRegularVideoViewStartEvent({
+        videoUrl: playerAdapter.getCurrentSrc(),
         trackingType: 'auto',
       }, options);
       const videoViewEventCollector = createEventsCollector(viewId, viewStartEvent);

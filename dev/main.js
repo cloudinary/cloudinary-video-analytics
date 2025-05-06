@@ -17,7 +17,7 @@ const videos = [
 ];
 
 window.addEventListener('load', () => {
-  const manualVideoElement = document.querySelector('#main-video-player');
+  const manualVideoElement = document.getElementById('main-video-player');
   const manualCloudinaryAnalytics = connectCloudinaryAnalytics(manualVideoElement);
   const connectVideoPanel = () => {
     let currentSelectedRadioValue = '0';
@@ -45,14 +45,14 @@ window.addEventListener('load', () => {
   });
 
   // connect extra videos
-  const extraVideo1Element = document.querySelector('#extra-video-1');
+  const extraVideo1Element = document.getElementById('extra-video-1');
   const extraVideo1CldAnalytics = connectCloudinaryAnalytics(extraVideo1Element);
   extraVideo1CldAnalytics.startManualTracking({
     cloudName: 'demo',
     publicId: videos[0].publicId,
   });
 
-  const extraVideo2Element = document.querySelector('#extra-video-2');
+  const extraVideo2Element = document.getElementById('extra-video-2');
   const extraVideo2CldAnalytics = connectCloudinaryAnalytics(extraVideo2Element);
   extraVideo2CldAnalytics.startManualTracking({
     cloudName: 'demo',
@@ -60,7 +60,7 @@ window.addEventListener('load', () => {
   });
 
   // auto detection
-  const autoVideoElement = document.querySelector('#auto-video-player');
+  const autoVideoElement = document.getElementById('auto-video-player');
   const autoCloudinaryAnalytics = connectCloudinaryAnalytics(autoVideoElement);
   const connectAutoVideoPanel = () => {
     let currentSelectedRadioValue = '0';
@@ -95,5 +95,14 @@ window.addEventListener('load', () => {
         };
       }
     },
+  });
+
+  // live stream
+  const liveStreamVideoElement = document.getElementById('live-stream-video-player');
+  const liveStreamCldAnalytics = connectCloudinaryAnalytics(liveStreamVideoElement);
+  liveStreamCldAnalytics.startManualTracking({
+    cloudName: 'demo',
+    publicId: 'live-stream-public-id',
+    type: 'live',
   });
 });

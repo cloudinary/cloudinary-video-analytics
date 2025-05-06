@@ -1,7 +1,7 @@
-import { registerPlayEvent } from './events/play-event';
-import { registerPauseEvent } from './events/pause-event';
-import { registerMetadataEvent } from './events/metadata-event';
-import { createEvent } from './utils/events';
+import { registerPlayEvent } from '../events/play-event';
+import { registerPauseEvent } from '../events/pause-event';
+import { registerMetadataEvent } from '../events/metadata-event';
+import { createEvent } from '../utils/events';
 
 export const initEventsCollector = (playerAdapter) => {
   const collectedEvents = {};
