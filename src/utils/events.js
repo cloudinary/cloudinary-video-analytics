@@ -7,7 +7,7 @@ export const createRegularVideoViewStartEvent = (baseData, customerOptions) => {
   const isValidCustomData = isCustomDataValid(customData);
   const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(baseData.videoUrl, customerOptions.customVideoUrlFallback) : null;
   const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
-  return createEvent(VIEW_EVENT.START, {
+  return createEventWithoutTime(VIEW_EVENT.START, {
     ...baseData,
     analyticsModuleVersion: ANALYTICS_VERSION,
     videoPlayer: {
@@ -22,39 +22,32 @@ export const createRegularVideoViewStartEvent = (baseData, customerOptions) => {
 };
 
 export const createRegularVideoViewEndEvent = (baseData = {}) => {
-  return createEvent(VIEW_EVENT.END, { ...baseData });
+  return createEventWithoutTime(VIEW_EVENT.END, { ...baseData });
 };
 
 export const createLiveStreamViewStartEvent = (baseData, customerOptions) => {
-  const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(baseData.videoUrl, customerOptions.customVideoUrlFallback) : null;
-  const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
-  return createEvent(VIEW_EVENT.START, {
+  return createEventWithoutTime(VIEW_EVENT.START, {
     ...baseData,
     analyticsModuleVersion: ANALYTICS_VERSION,
     videoPlayer: {
       type: getVideoPlayerType(customerOptions?.videoPlayerType),
       version: getVideoPlayerVersion(customerOptions?.videoPlayerVersion),
     },
-    videoData: {
-      ...customerVideoData,
-    },
   });
 };
 
 export const createLiveStreamViewEndEvent = (baseData, customerOptions) => {
-  const customerVideoDataFromFallback = customerOptions?.customVideoUrlFallback ? useCustomerVideoDataFallback(baseData.videoUrl, customerOptions.customVideoUrlFallback) : null;
-  const customerVideoData = parseCustomerVideoData(customerVideoDataFromFallback);
-  return createEvent(VIEW_EVENT.END, {
-    ...baseData,
-    videoData: {
-      ...customerVideoData,
-    },
-  });
+  return createEventWithoutTime(VIEW_EVENT.END, { ...baseData });
 };
 
 export const createEvent = (eventName, eventDetails) => ({
   eventName,
   eventTime: Date.now(),
+  eventDetails,
+});
+
+export const createEventWithoutTime = (eventName, eventDetails) => ({
+  eventName,
   eventDetails,
 });
 

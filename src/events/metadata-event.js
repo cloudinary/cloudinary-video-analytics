@@ -15,7 +15,8 @@ export const registerMetadataEvent = (playerAdapter, reportEvent) => {
   const eventLoadedMetadataClearCallback = playerAdapter.onLoadedMetadata(() => reportLoadedMetadata());
 
   if (playerAdapter.getReadyState() > 0) {
-    reportLoadedMetadata();
+    // make it async to allow collect any initial events
+    setTimeout(() => reportLoadedMetadata(), 0);
   }
 
   return () => {
