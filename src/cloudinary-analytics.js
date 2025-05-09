@@ -114,7 +114,10 @@ export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
           }, options)
         );
       },
-      onPageViewEnd: () => finishVideoTracking(),
+      onPageViewEnd: () => {
+        finishVideoTracking();
+        videoViewEventCollector.destroy();
+      },
     }, isMobileDetected);
 
     videoTrackingSession = {
@@ -216,9 +219,13 @@ export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
 
     createPageTracker({
       onPageViewStart: () => startVideoTracking(),
-      onPageViewEnd: () => finishVideoTracking(),
+      onPageViewEnd: () => {
+        finishVideoTracking();
+        videoViewEventCollector.destroy();
+      },
     }, isMobileDetected);
 
+    // TODO: check if we need to listen also on loadmetadata to make sure source url is available
     playerAdapter.onLoadStart(() => !videoTrackingSession && startVideoTracking());
     playerAdapter.onEmptied(() => clearVideoTracking());
   };
