@@ -10,7 +10,7 @@ export const nativeHtmlVideoPlayerAdapter = (videoElement) => ({
   onCanPlayThrough: (callback) => createBaseOnEventListener(videoElement, 'canplaythrough', callback),
   onComplete: (callback) => createBaseOnEventListener(videoElement, 'complete', callback),
   onDurationChange: (callback) => createBaseOnEventListener(videoElement, 'durationchange', callback),
-  onEmptied: (callback) => createBaseOnEventListener(videoElement, 'complete', callback),
+  onEmptied: (callback) => createBaseOnEventListener(videoElement, 'emptied', callback),
   onEnded: (callback) => createBaseOnEventListener(videoElement, 'ended', callback),
   onError: (callback) => createBaseOnEventListener(videoElement, 'error', callback),
   onLoadedData: (callback) => createBaseOnEventListener(videoElement, 'loadeddata', callback),
