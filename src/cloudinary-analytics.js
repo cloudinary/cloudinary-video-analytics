@@ -20,8 +20,8 @@ const CLD_ANALYTICS_ENDPOINTS_LIST = {
     liveStreams: 'https://video-analytics-api.cloudinary.com/v1/live-streams',
   },
   development: {
-    default: 'http://localhost:3001/events',
-    liveStreams: 'http://localhost:3001/events',
+    default: 'https://video-analytics-api.cloudinary.com/v1/video-analytics',
+    liveStreams: 'https://production-video-service.cloudinary.com/internal/live_streams/analytics/v1',
   },
 };
 const CLD_ANALYTICS_ENDPOINT = process.env.NODE_ENV === 'development' ? CLD_ANALYTICS_ENDPOINTS_LIST.development : CLD_ANALYTICS_ENDPOINTS_LIST.production;
