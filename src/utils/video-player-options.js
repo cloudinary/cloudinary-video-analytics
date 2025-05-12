@@ -6,6 +6,7 @@ export const getVideoPlayerType = (videoPlayerType) => {
   if (ALLOWED_VIDEO_PLAYER_TYPES.includes(videoPlayerType)) {
     return videoPlayerType;
   }
+
   return NATIVE_VIDEO_PLAYER;
 };
 

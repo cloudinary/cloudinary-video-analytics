@@ -1,117 +1,233 @@
 import { isMobile } from 'is-mobile';
-import { metadataValidator } from './utils/metadata-validator';
 import { initEventsCollector } from './events-collector';
-import { getVideoViewId } from './utils/video-view-id';
-import { getUserId } from './utils/user-id';
-import { setupDefaultDataCollector } from './default-data-collector';
+import { getVideoViewId, getUserId } from './utils/unique-ids';
 import { sendBeaconRequest } from './utils/send-beacon-request';
-import { getVideoSource } from './utils/video-source';
-import { createViewStartEvent } from './utils/base-events';
-import { VIDEO_CUSTOM_EVENT_PREFIX } from './events.consts';
+import {
+  createRegularVideoViewEndEvent,
+  createLiveStreamViewStartEvent,
+  createLiveStreamViewEndEvent,
+  createRegularVideoViewStartEvent,
+  prepareEvents,
+} from './utils/events';
+import { throwErrorIfInvalid, metadataValidator, mainOptionsValidator, trackingOptionsValidator } from './utils/validators';
+import { nativeHtmlVideoPlayerAdapter } from './player-adapters/nativeHtmlVideoPlayerAdapter';
+import { parseCustomerVideoData } from './utils/customer-data';
+import { createPageTracker } from './utils/page-events';
 
-const CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL = 'https://video-analytics-api.cloudinary.com/v1/video-analytics';
-const CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL = 'http://localhost:3001/events';
-const CLD_ANALYTICS_ENDPOINT_URL = process.env.NODE_ENV === 'development' ? CLD_ANALYTICS_ENDPOINT_DEVELOPMENT_URL : CLD_ANALYTICS_ENDPOINT_PRODUCTION_URL;
+const CLD_ANALYTICS_ENDPOINTS_LIST = {
+  production: {
+    default: 'https://video-analytics-api.cloudinary.com/v1/video-analytics',
+    liveStreams: 'https://video-analytics-api.cloudinary.com/v1/live-streams',
+  },
+  development: {
+    default: 'http://localhost:3001/events',
+    liveStreams: 'http://localhost:3001/events',
+  },
+};
+const CLD_ANALYTICS_ENDPOINT = process.env.NODE_ENV === 'development' ? CLD_ANALYTICS_ENDPOINTS_LIST.development : CLD_ANALYTICS_ENDPOINTS_LIST.production;
 
 export const connectCloudinaryAnalytics = (videoElement, mainOptions = {}) => {
-  if (mainOptions && typeof mainOptions !== 'object') {
-    throw `Options property must be an object`;
+  throwErrorIfInvalid(
+    mainOptionsValidator(mainOptions),
+    'Cloudinary video analytics requires proper options object'
+  );
+
+  if (!mainOptions.playerAdapter) {
+    mainOptions.playerAdapter = nativeHtmlVideoPlayerAdapter(videoElement);
   }
 
   let videoTrackingSession = null;
-  const shouldUseCustomEvents = mainOptions.customEvents === true;
+  const userId = getUserId();
+  const { playerAdapter } = mainOptions;
   const isMobileDetected = isMobile({ tablet: true, featureDetect: true });
-  const createEventsCollector = initEventsCollector(videoElement, shouldUseCustomEvents);
-  const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT_URL, data);
+  const createEventsCollector = initEventsCollector(playerAdapter);
   const clearVideoTracking = () => {
     if (videoTrackingSession) {
       videoTrackingSession.clear();
       videoTrackingSession = null;
     }
   };
+  const viewId = {
+    _value: getVideoViewId(),
+    getValue: () => viewId._value,
+    regenerateValue: () => {
+      viewId._value = getVideoViewId();
+
+      if (videoTrackingSession) {
+        videoTrackingSession.viewId = viewId._value;
+      }
+
+      return viewId._value;
+    },
+  };
+
   const startManualTracking = (metadata, options = {}) => {
-    // validate if user provided all necessary metadata (cloud name, public id)
-    const metadataValidationResult = metadataValidator(metadata);
-    if (!metadataValidationResult.isValid) {
-      throw `Cloudinary video analytics tracking called without necessary data (${metadataValidationResult.errorMessage})`;
+    if (videoTrackingSession?.type === 'auto') {
+      throw 'Cloudinary video analytics auto tracking is already connected with this HTML Video Element, to start manual tracking you need to stop auto tracking';
     }
 
-    if (options && typeof options !== 'object') {
-      throw `Options property must be an object`;
-    }
+    throwErrorIfInvalid(
+      metadataValidator(metadata),
+      'Cloudinary video analytics manual tracking called without necessary data'
+    );
+    throwErrorIfInvalid(
+      trackingOptionsValidator(options),
+      'Cloudinary video analytics manual tracking called with invalid options'
+    );
 
-    options.customVideoUrlFallback = () => metadata;
     clearVideoTracking();
 
-    // start new tracking
-    const viewId = getVideoViewId();
-    const sourceUrl = getVideoSource(videoElement);
-    const viewStartEvent = createViewStartEvent(sourceUrl, {
-      trackingType: 'manual',
-    }, options);
-    const videoViewEventCollector = createEventsCollector(viewId, viewStartEvent);
-    const dataCollectorRemoval = setupDefaultDataCollector({
-      userId: getUserId(),
-      viewId,
-    }, videoViewEventCollector.flushEvents, sendData, isMobileDetected);
+    if (metadata.type === 'live') {
+      _startManualTrackingLiveStream(metadata, options);
+    } else {
+      options.customVideoUrlFallback = options.customVideoUrlFallback || (() => metadata);
+      _startManualTrackingRegularVideo(metadata, options);
+    }
+  };
+
+  const _startManualTrackingRegularVideo = (metadata, options) => {
+    const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT.default, data);
+    const videoViewEventCollector = createEventsCollector();
+    const finishVideoTracking = () => {
+      // multiple events can be triggered one by one for specific browsers but we don't have guarantee which ones
+      // in this case send data for first event and for rest just skip it to avoid empty payload
+      if (videoViewEventCollector.getCollectedEventsCount() > 0) {
+        videoViewEventCollector.addEvent(createRegularVideoViewEndEvent());
+        const events = prepareEvents([...videoViewEventCollector.flushEvents()]);
+        sendData({
+          userId,
+          viewId: viewId.getValue(),
+          events,
+        });
+      }
+    };
+
+    const pageEventsRemoval = createPageTracker({
+      onPageViewStart: () => {
+        viewId.regenerateValue();
+
+        videoViewEventCollector.start(viewId.getValue());
+        videoViewEventCollector.addEvent(
+          createRegularVideoViewStartEvent({
+            videoUrl: playerAdapter.getCurrentSrc(),
+            trackingType: 'manual',
+          }, options)
+        );
+      },
+      onPageViewEnd: () => {
+        finishVideoTracking();
+        videoViewEventCollector.destroy();
+      },
+    }, isMobileDetected);
 
     videoTrackingSession = {
       viewId,
+      type: 'manual',
+      subtype: 'default',
       clear: () => {
+        finishVideoTracking();
         videoViewEventCollector.destroy();
-        dataCollectorRemoval();
+        pageEventsRemoval();
+      },
+    };
+  };
+  const _startManualTrackingLiveStream = (metadata, options) => {
+    const liveStreamData = parseCustomerVideoData(metadata);
+    const sendLiveStreamEvent = (event) => {
+      sendBeaconRequest(CLD_ANALYTICS_ENDPOINT.liveStreams, {
+        userId,
+        viewId: viewId.getValue(),
+        events: prepareEvents([event]),
+      });
+    };
+    const pageEventsRemoval = createPageTracker({
+      onPageViewStart: () => {
+        viewId.regenerateValue();
+
+        sendLiveStreamEvent(
+          createLiveStreamViewStartEvent({ liveStreamData }, options)
+        );
+      },
+      onPageViewEnd: () => {
+        sendLiveStreamEvent(
+          createLiveStreamViewEndEvent({ liveStreamData }, options)
+        );
+      },
+    }, isMobileDetected);
+
+    videoTrackingSession = {
+      viewId: viewId.getValue(),
+      type: 'manual',
+      subtype: 'live-stream',
+      clear: () => {
+        pageEventsRemoval();
       },
     };
   };
 
   const startAutoTracking = (options = {}) => {
     if (videoTrackingSession) {
-      throw `Cloudinary video analytics tracking is already connected with this HTML Video Element`;
+      throw 'Cloudinary video analytics tracking is already connected with this HTML Video Element';
     }
 
-    if (options && typeof options !== 'object') {
-      throw `Options property must be an object`;
-    }
+    throwErrorIfInvalid(
+      trackingOptionsValidator(options),
+      'Cloudinary video analytics auto tracking called with invalid options'
+    );
 
-    const onNewVideoSource = () => {
-      const sourceUrl = getVideoSource(videoElement);
+    const sendData = (data) => sendBeaconRequest(CLD_ANALYTICS_ENDPOINT.default, data);
+    const videoViewEventCollector = createEventsCollector();
+
+    const finishVideoTracking = () => {
+      // multiple events can be triggered one by one for specific browsers but we don't have guarantee which ones
+      // in this case send data for first event and for rest just skip it to avoid empty payload
+      if (videoViewEventCollector.getCollectedEventsCount() > 0) {
+        videoViewEventCollector.addEvent(createRegularVideoViewEndEvent());
+        const events = prepareEvents([...videoViewEventCollector.flushEvents()]);
+        sendData({
+          userId,
+          viewId: viewId.getValue(),
+          events,
+        });
+      }
+    };
+
+    const startVideoTracking = () => {
+      const sourceUrl = playerAdapter.getCurrentSrc();
       if (sourceUrl === window.location.href || !sourceUrl) {
         return null;
       }
 
-      // start new tracking
-      const viewId = getVideoViewId();
-      const viewStartEvent = createViewStartEvent(sourceUrl, {
-        trackingType: 'auto',
-      }, options);
-      const videoViewEventCollector = createEventsCollector(viewId, viewStartEvent);
-      const dataCollectorRemoval = setupDefaultDataCollector({
-        userId: getUserId(),
-        viewId,
-      }, videoViewEventCollector.flushEvents, sendData, isMobileDetected);
+      viewId.regenerateValue();
+      videoViewEventCollector.start(viewId.getValue());
+      videoViewEventCollector.addEvent(
+        createRegularVideoViewStartEvent({
+          videoUrl: sourceUrl,
+          trackingType: 'auto',
+        }, options)
+      );
 
       videoTrackingSession = {
         viewId,
+        type: 'auto',
         clear: () => {
+          finishVideoTracking();
           videoViewEventCollector.destroy();
-          dataCollectorRemoval();
         },
       };
     };
-    const loadStartEventName = shouldUseCustomEvents ? `${VIDEO_CUSTOM_EVENT_PREFIX}loadstart` : 'loadstart';
-    const emptiedEventName = shouldUseCustomEvents ? `${VIDEO_CUSTOM_EVENT_PREFIX}emptied` : 'emptied';
 
-    videoElement.addEventListener(loadStartEventName, () => {
-      if (!videoTrackingSession) {
-        onNewVideoSource();
-      }
-    });
-    videoElement.addEventListener(emptiedEventName, () => {
-      clearVideoTracking();
-    });
+    createPageTracker({
+      onPageViewStart: () => startVideoTracking(),
+      onPageViewEnd: () => {
+        finishVideoTracking();
+        videoViewEventCollector.destroy();
+      },
+    }, isMobileDetected);
 
-    // start tracking for initial video
-    onNewVideoSource();
+    // TODO: check if we need to listen also on loadmetadata to make sure source url is available
+    playerAdapter.onLoadStart(() => !videoTrackingSession && startVideoTracking());
+    playerAdapter.onEmptied(() => clearVideoTracking());
   };
 
   return {

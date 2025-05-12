@@ -13,3 +13,7 @@ export const getUserId = () => {
   window.localStorage.setItem(CLD_ANALYTICS_USER_ID_KEY, userId);
   return userId;
 };
+
+export const getVideoViewId = () => {
+  return uuidv4().replace(/-/g, '');
+};

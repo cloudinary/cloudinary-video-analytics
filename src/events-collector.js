@@ -1,44 +1,69 @@
-import { registerNativePlayEvent, registerCustomPlayEvent } from './events/play-event';
-import { registerNativePauseEvent, registerCustomPauseEvent } from './events/pause-event';
-import { registerNativeMetadataEvent, registerCustomMetadataEvent } from './events/metadata-event';
-import { createEvent } from './utils/create-event';
-import { tryInitEvents } from './utils/video-metadata';
+import { registerPlayEvent } from './events/play-event';
+import { registerPauseEvent } from './events/pause-event';
+import { registerMetadataEvent } from './events/metadata-event';
+import { createEvent } from './utils/events';
 
-export const initEventsCollector = (videoElement, shouldUseCustomEvents) => {
+export const initEventsCollector = (playerAdapter) => {
   const collectedEvents = {};
   const rawEvents = {};
 
-  return (viewId, viewStartEvent) => {
-    // create new collection of events for new video view
-    collectedEvents[viewId] = [];
-    rawEvents[viewId] = [viewStartEvent];
-    const videoViewCollectedEvents = collectedEvents[viewId];
-    const videoViewRawEvents = rawEvents[viewId];
+  return () => {
+    let viewId = null;
+    const registeredEvents = [];
 
-    const reportEvent = (eventName, eventDetails) => videoViewRawEvents.push(createEvent(eventName, eventDetails));
-    const registeredEvents = shouldUseCustomEvents ? [
-      registerCustomPlayEvent(videoElement, reportEvent),
-      registerCustomPauseEvent(videoElement, reportEvent),
-      registerCustomMetadataEvent(videoElement, reportEvent),
-    ] : [
-      registerNativePlayEvent(videoElement, reportEvent),
-      registerNativePauseEvent(videoElement, reportEvent),
-      registerNativeMetadataEvent(videoElement, reportEvent),
-    ];
-    tryInitEvents(videoElement, shouldUseCustomEvents);
+    const start = (_viewId) => {
+      if (viewId) {
+        throw new Error('Events collector session already started');
+      }
+
+      // create new collection of events for new video view
+      viewId = _viewId;
+      collectedEvents[viewId] = [];
+      rawEvents[viewId] = [];
+      registeredEvents.push(
+        registerPlayEvent(playerAdapter, reportEvent),
+        registerPauseEvent(playerAdapter, reportEvent),
+        registerMetadataEvent(playerAdapter, reportEvent),
+      );
+    };
+    const destroy = () => {
+      if (!viewId) {
+        throw new Error('Events collector session not started');
+      }
+
+      registeredEvents.forEach((cb) => cb());
+      viewId = null;
+    };
+    const reportEvent = (eventName, eventDetails) => {
+      if (!viewId) {
+        throw new Error('Events collector session not started');
+      }
+
+      rawEvents[viewId].push(createEvent(eventName, eventDetails));
+    };
     const flushEvents = () => {
-      const events = videoViewRawEvents.splice(0, videoViewRawEvents.length);
-      videoViewCollectedEvents.splice(videoViewCollectedEvents.length, 0, ...events);
+      if (!viewId) {
+        throw new Error('Events collector session not started');
+      }
+
+      const events = rawEvents[viewId].splice(0, rawEvents[viewId].length);
+      collectedEvents[viewId].splice(collectedEvents[viewId].length, 0, ...events);
       return events;
     };
-    const getAllEvents = () => videoViewCollectedEvents;
-    const destroy = () => {
-      registeredEvents.forEach((cb) => cb());
+
+    const getCollectedEventsCount = () => {
+      if (viewId) {
+        return rawEvents[viewId]?.length || 0;
+      }
+
+      return 0;
     };
 
     return {
       flushEvents,
-      getAllEvents,
+      getCollectedEventsCount,
+      addEvent: ({ eventName, eventDetails }) => reportEvent(eventName, eventDetails),
+      start,
       destroy,
     };
   }
