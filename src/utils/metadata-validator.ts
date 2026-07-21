@@ -1,27 +1,31 @@
-export const metadataValidator = (metadata) => {
-  if (typeof metadata !== 'object') {
+import type { ValidationResult, VideoMetadata } from '../types';
+
+export const metadataValidator = (metadata: unknown): ValidationResult => {
+  if (typeof metadata !== 'object' || metadata === null) {
     return {
       isValid: false,
       errorMessage: 'Metadata param needs to be an object',
     };
   }
 
-  if (typeof metadata.cloudName !== 'string') {
+  const data = metadata as Partial<VideoMetadata>;
+
+  if (typeof data.cloudName !== 'string') {
     return {
       isValid: false,
       errorMessage: 'You need to provide proper cloud name of your Cloudinary account [cloudName: string]',
     };
   }
 
-  if (typeof metadata.type === 'string' && metadata.type !== 'live') {
+  if (typeof data.type === 'string' && data.type !== 'live') {
     return {
       isValid: false,
       errorMessage: 'Property "type" can be either undefined or "live" value [type: "live"]',
     };
   }
 
-  if (typeof metadata.publicId !== 'string') {
-    if (metadata.type === 'live') {
+  if (typeof data.publicId !== 'string') {
+    if (data.type === 'live') {
       return {
         isValid: false,
         errorMessage: 'You need to provide proper public ID of your Live Stream output [publicId: string]',

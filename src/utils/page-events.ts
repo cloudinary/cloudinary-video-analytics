@@ -1,4 +1,6 @@
-export const createPageTracker = (events, isMobile) => {
+import type { PageEvents, RemoveListener } from '../types';
+
+export const createPageTracker = (events: PageEvents, isMobile: boolean): RemoveListener => {
   if (isMobile) {
     return createMobilePageTracker(events);
   }
@@ -6,7 +8,7 @@ export const createPageTracker = (events, isMobile) => {
   return createDesktopPageTracker(events);
 };
 
-const createMobilePageTracker = ({ onPageViewStart, onPageViewEnd }) => {
+const createMobilePageTracker = ({ onPageViewStart, onPageViewEnd }: PageEvents): RemoveListener => {
   const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
       onPageViewStart?.();
@@ -26,7 +28,7 @@ const createMobilePageTracker = ({ onPageViewStart, onPageViewEnd }) => {
   };
 };
 
-const createDesktopPageTracker = ({ onPageViewStart, onPageViewEnd }) => {
+const createDesktopPageTracker = ({ onPageViewStart, onPageViewEnd }: PageEvents): RemoveListener => {
   const handlePageLoad = () => onPageViewStart?.();
   const handleBeforeUnload = () => onPageViewEnd?.();
 

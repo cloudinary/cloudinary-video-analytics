@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const CLD_ANALYTICS_USER_ID_KEY = 'cld-analytics-user-id';
 
-export const getUserId = () => {
+export const getUserId = (): string => {
   const storageUserId = window.localStorage.getItem(CLD_ANALYTICS_USER_ID_KEY);
 
   if (storageUserId) {
@@ -14,6 +14,6 @@ export const getUserId = () => {
   return userId;
 };
 
-export const getVideoViewId = () => {
+export const getVideoViewId = (): string => {
   return uuidv4().replace(/-/g, '');
 };

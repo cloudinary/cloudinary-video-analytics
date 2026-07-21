@@ -1,6 +1,9 @@
-export const sendBeaconRequest = (url, data) => {
+export const sendBeaconRequest = (
+  url: string,
+  data: Record<string, unknown>,
+): boolean | Promise<Response> => {
   const params = Object.keys(data).reduce((formData, key) => {
-    formData.append(key, data[key]);
+    formData.append(key, data[key] as string | Blob);
     return formData;
   }, new FormData());
 
@@ -9,7 +12,7 @@ export const sendBeaconRequest = (url, data) => {
       method: 'POST',
       mode: 'no-cors',
       body: params,
-      keepalive: true
+      keepalive: true,
     });
   }
 
