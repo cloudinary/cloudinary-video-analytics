@@ -3,11 +3,14 @@
   "version": "1.8.2",
   "description": "",
   "main": "dist/main.js",
+  "types": "dist/index.d.ts",
+  "packageManager": "pnpm@10.33.2",
   "scripts": {
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production webpack && tsc -p tsconfig.types.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "start": "webpack serve --config webpack.dev.config.js ",
     "start-server": "node ./dev/http-server.js",
-    "dev": "concurrently --kill-others \"yarn start-server\" \"yarn start\""
+    "dev": "concurrently --kill-others \"pnpm start-server\" \"pnpm start\""
   },
   "author": "Cloudinary",
   "license": "MIT",
@@ -16,13 +19,12 @@
     "uuid": "14.0.0"
   },
   "devDependencies": {
-    "@babel/core": "7.22.5",
-    "@babel/preset-env": "7.22.5",
-    "babel-loader": "9.1.2",
     "concurrently": "8.2.0",
     "html-webpack-plugin": "5.5.0",
     "http": "0.0.1-security",
     "multiparty": "4.2.3",
+    "ts-loader": "9.5.1",
+    "typescript": "5.5.4",
     "webpack": "5.88.2",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "4.15.1",

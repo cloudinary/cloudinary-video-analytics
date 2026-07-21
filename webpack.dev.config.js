@@ -4,10 +4,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const productionWebpackConfig = require('./webpack.config');
 
 module.exports = merge(productionWebpackConfig, {
-  entry: './dev/main.js',
+  entry: './dev/main.ts',
   resolve: {
     alias: {
-      'cloudinary-video-analytics': path.resolve(__dirname, 'src/index.js'),
+      'cloudinary-video-analytics': path.resolve(__dirname, 'src/index.ts'),
     },
   },
   mode: 'development',
